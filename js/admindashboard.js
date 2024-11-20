@@ -6,3 +6,5 @@
             sidebar.classList.toggle('active');
             content.classList.toggle('shrink');
         });
+
+      
