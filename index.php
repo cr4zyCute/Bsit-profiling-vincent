@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="icon" href="./images/bsitlogo.png">
     <link rel="stylesheet" href="./css/index.css">
 </head>
 <body>
  <header>
-//NIkki gwapo
+    
         <nav class="navbar">
-            <span class="hamburger-btn material-symbols-rounded">Menu</span>
+            <span class="hamburger-btn material-symbols-rounded">menu</span>
             <a href="#" class="logo">
                 <img src="images/logo.jpg" alt="logo">
                 <h2>CodingNepal</h2>
@@ -18,8 +19,6 @@
             <ul class="links">
                 <span class="close-btn material-symbols-rounded">close</span>
                 <li><a href="#">Home</a></li>
-                <li><a href="#">Portfolio</a></li>
-                <li><a href="#">Courses</a></li>
                 <li><a href="#">About us</a></li>
                 <li><a href="#">Contact us</a></li>
             </ul>
@@ -99,6 +98,30 @@
                 </div>
             </div>
         </div>
+    </section>
+    <section>
+       <div class="form signup_form">
+          <form action="#">
+            <h2>Signup</h2>
+            <div class="input_box">
+              <input type="email" placeholder="Enter your email" required />
+              <i class="uil uil-envelope-alt email"></i>
+            </div>
+            <div class="input_box">
+              <input type="password" placeholder="Create password" required />
+              <i class="uil uil-lock password"></i>
+              <i class="uil uil-eye-slash pw_hide"></i>
+            </div>
+            <div class="input_box">
+              <input type="password" placeholder="Confirm password" required />
+              <i class="uil uil-lock password"></i>
+              <i class="uil uil-eye-slash pw_hide"></i>
+            </div>
+            <button class="button">Signup Now</button>
+            <div class="login_signup">Already have an account? <a href="#" id="login">Login</a></div>
+          </form>
+        </div>
+      </div>
     </section>
 
     <footer>
