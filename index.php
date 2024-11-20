@@ -27,7 +27,7 @@
     </header>
     
     <section id="home" > 
-        <h1>BSIT</h1>
+        <img src="./images/IMG_3564.jpg" alt="">
     </section>
 
     <section>
@@ -99,38 +99,42 @@
             </div>
         </div>
     </section>
-    <section>
-       <div class="form signup_form">
+    <section id="formContianer" >
+       <div class="form_container">
+        <i class="uil uil-times form_close"></i>
+        <div class="form login_form">
           <form action="#">
-            <h2>Signup</h2>
+            <h2>Login</h2>
             <div class="input_box">
               <input type="email" placeholder="Enter your email" required />
               <i class="uil uil-envelope-alt email"></i>
             </div>
             <div class="input_box">
-              <input type="password" placeholder="Create password" required />
+              <input type="password" placeholder="Enter your password" required />
               <i class="uil uil-lock password"></i>
               <i class="uil uil-eye-slash pw_hide"></i>
             </div>
-            <div class="input_box">
-              <input type="password" placeholder="Confirm password" required />
-              <i class="uil uil-lock password"></i>
-              <i class="uil uil-eye-slash pw_hide"></i>
+            <div class="option_field">
+              <span class="checkbox">
+                <input type="checkbox" id="check" />
+                <label for="check">Remember me</label>
+              </span>
+              <a href="#" class="forgot_pw">Forgot password?</a>
             </div>
-            <button class="button">Signup Now</button>
-            <div class="login_signup">Already have an account? <a href="#" id="login">Login</a></div>
+            <button class="button">Login Now</button>
+            <div class="login_signup">Don't have an account? <a href="#" id="signup">Signup</a></div>
           </form>
         </div>
-      </div>
+        </div>
     </section>
-
+ 
     <footer>
         <p>&copy; 2024 BSIT. All rights reserved.</p>
         <div class="footer-links">
             <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
         </div>
     </footer>
-
+<script src="./js/index.js" ></script>
 <script type="text/javascript">
     window.addEventListener('scroll', reveal);
 function reveal(){
