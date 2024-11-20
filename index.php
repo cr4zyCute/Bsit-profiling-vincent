@@ -20,8 +20,8 @@
             </a>
             <ul class="links">
                 <span class="close-btn material-symbols-rounded">close</span>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About us</a></li>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About us</a></li>
                 <li><a href="#">Contact us</a></li>
             </ul>
             <button class="login-btn">LOG IN</button>
@@ -30,6 +30,36 @@
     
     <section id="home" > 
         <img src="./images/IMG_3564.jpg" alt="">
+            <section id="formContianer" >
+       <div class="form_container">
+        <i class="uil uil-times form_close"></i>
+        <div class="form login_form">
+          <form action="#">
+            <h2>Login</h2>
+            <div class="input_box">
+              <input type="email" placeholder="Enter your email" required />
+              <i class="uil uil-envelope-alt email"></i>
+            </div>
+            <div class="input_box">
+              <input type="password" placeholder="Enter your password" required />
+              <i class="uil uil-lock password"></i>
+              
+            </div>
+            <div class="option_field">
+              <span class="checkbox">
+                <input type="checkbox" id="check" />
+                <label for="check">Remember me</label>
+              </span>
+            </div>
+            <button class="button">Login Now</button>   
+            <div class="login_signup">Don't have an account? 
+                <div>
+                <a href="studentRegistrationForm.php" id="signup" style="z-index: 1;" >Signup</a></div>
+                </div>
+          </form>
+        </div>
+        </div>
+    </section>
     </section>
 
     <section>
@@ -101,34 +131,7 @@
             </div>
         </div>
     </section>
-    <section id="formContianer" >
-       <div class="form_container">
-        <i class="uil uil-times form_close"></i>
-        <div class="form login_form">
-          <form action="#">
-            <h2>Login</h2>
-            <div class="input_box">
-              <input type="email" placeholder="Enter your email" required />
-              <i class="uil uil-envelope-alt email"></i>
-            </div>
-            <div class="input_box">
-              <input type="password" placeholder="Enter your password" required />
-              <i class="uil uil-lock password"></i>
-              
-            </div>
-            <div class="option_field">
-              <span class="checkbox">
-                <input type="checkbox" id="check" />
-                <label for="check">Remember me</label>
-              </span>
-              <a href="#" class="forgot_pw">Forgot password?</a>
-            </div>
-            <button class="button">Login Now</button>
-            <div class="login_signup">Don't have an account? <a href="#" id="signup">Signup</a></div>
-          </form>
-        </div>
-        </div>
-    </section>
+
  
     <footer>
         <p>&copy; 2024 BSIT. All rights reserved.</p>
