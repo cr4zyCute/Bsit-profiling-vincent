@@ -1,75 +1,131 @@
-
 <?php
-require 'database/db.php';
-session_start(); 
+include "./database/db.php";
 
-if (!empty($_SESSION['student_id'])) {
-    $student_id = $_SESSION['student_id'];
+if (isset($_POST['submit'])) {
 
-    $query = "
-        SELECT student.*, loginCredentials.email 
-        FROM student 
-        JOIN loginCredentials ON student.id = loginCredentials.student_id 
-        WHERE student.id = '$student_id'
-    ";
+    $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
+    $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
+    $middlename = mysqli_real_escape_string($conn, $_POST['middlename']);
+    $age = mysqli_real_escape_string($conn, $_POST['age']);
+    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = $_POST['password'];
 
-    $result = mysqli_query($conn, $query);
+    $uploadDir = 'uploads/';
+    $imageName = $_FILES['profilePicture']['name'];
+    $imageTmpName = $_FILES['profilePicture']['tmp_name'];
+    $imagePath = $uploadDir . basename($imageName);
 
-    if ($result && mysqli_num_rows($result) > 0) {
-        $student = mysqli_fetch_assoc($result);
+    $select = "SELECT * FROM loginCredentials WHERE email = '$email'";
+    $result = mysqli_query($conn, $select);
+
+    if (mysqli_num_rows($result) > 0) {
+        $error[] = 'User already exists!';
     } else {
-        echo "Student profile not found."; 
-        exit();
+
+        if (move_uploaded_file($imageTmpName, $imagePath)) {
+        
+            $insert_student = "INSERT INTO student (firstname, lastname, middlename, age, gender, address, phone, image) 
+                VALUES ('$firstname', '$lastname', '$middlename', '$age', '$gender', '$address', '$phone', '$imagePath')";
+
+            if (mysqli_query($conn, $insert_student)) {
+                // Get the student ID
+                $student_id = mysqli_insert_id($conn);
+
+                // Hash the password and insert into 'loginCredentials'
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                $insert_credentials = "INSERT INTO loginCredentials (student_id, email, password) 
+                    VALUES ('$student_id', '$email', '$hashedPassword')";
+
+                if (mysqli_query($conn, $insert_credentials)) {
+                    header('Location: studentRegistrationForm.php');
+                    exit();
+                } else {
+                    echo 'Error inserting credentials: ' . mysqli_error($conn);
+                }
+            } else {
+                echo 'Error inserting student: ' . mysqli_error($conn);
+            }
+        } else {
+            echo 'Failed to upload profile picture!';
+        }
     }
-} else {
-    header("Location: loginForm.php");
-    exit();
 }
-
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User</title>
-    <link rel="stylesheet" href="css/studentProfile.css">
-    <link rel="icon" href="image/bsitlogo.png">
+    <title>Registration Form</title>
+    <link rel="icon" href="./images/bsitlogo.png">
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <div class="top-buttons">
-        <button class="settings-btn">⚙️</button>
-        <a href="loginForm.php">
-        <button class="logout-btn">🔄</button></a>
-    </div>
+<form>
+    <div class="container">
+      <form action="studentRegistrationForm.php" method="post" enctype="multipart/form-data">
+        <div class="form-section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstname">Firstname:</label>
+                    <input type="text" id="firstname" name="firstname">
+                </div>
+                <div class="form-group">
+                    <label for="middlename">Middlename:</label>
+                    <input type="text" id="middlename" name="middlename">
+                </div>
+                <div class="form-group">
+                    <label for="lastname">Lastname:</label>
+                    <input type="text" id="lastname" name="lastname">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age">
+                </div>
+                <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" name="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
 
-    <div class="id-card">
-        <div class="profile-container">
-            <?php
-    $res = mysqli_query($conn, "SELECT image FROM student");
-    while($row = mysqli_fetch_assoc($res)) {
-        $imagePath = "images-data/" . $row['image'];
-    ?>
-        <img src="<?php echo $imagePath; ?>" alt="Profile" class="profile-image" id="profileImage">
-    <?php } ?>
-        </div>
-        <p class="id-number">ID Number:  <?php echo $student['id'] ?></p>
-        <div class="card-body">
-            <div class="left-section info-box">
-                <p><strong>Name:</strong> <?php echo $student['firstname'] ?></p>
-                <p><strong>Last Name:</strong>  <?php echo $student['lastname'] ?></p>
-                <p><strong>Age:</strong>  <?php echo $student['age'] ?></p>
-                <p><strong>Gender:</strong>  <?php echo $student['gender'] ?></p>
+                <div class="form-group">
+                    <label for="phone">Contact Number:</label>
+                    <input type="text" id="contact" name="phone">
+                </div>
             </div>
-            <div class="separator"></div>
-            <div class="right-section info-box">
-                <p><strong>Address:</strong>  <?php echo $student['address'] ?></p>
-                <p><strong>Email:</strong> <?php echo $student['email'] ?></p>
-                <p><strong>Contact:</strong>  <?php echo $student['phone'] ?></p>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address">
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <div class="profile-pic">
+                <label for="profile-image">Profile Picture:</label>
+                <input type="file" id="profile-image" name="profile-image" accept="image/*">
+            </div>
+            <div class="login-section">
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <button class="register-btn">Register</button>
             </div>
         </div>
     </div>
+    </form>
 </body>
 </html>
