@@ -6,6 +6,8 @@
     <title>Document</title>
     <link rel="icon" href="./images/bsitlogo.png">
     <link rel="stylesheet" href="./css/index.css">
+    <link href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" rel="stylesheet">
+
 </head>
 <body>
  <header>
@@ -14,7 +16,7 @@
             <span class="hamburger-btn material-symbols-rounded">menu</span>
             <a href="#" class="logo">
                 <img src="images/logo.jpg" alt="logo">
-                <h2>CodingNepal</h2>
+                <h2>BSIT</h2>
             </a>
             <ul class="links">
                 <span class="close-btn material-symbols-rounded">close</span>
@@ -112,7 +114,7 @@
             <div class="input_box">
               <input type="password" placeholder="Enter your password" required />
               <i class="uil uil-lock password"></i>
-              <i class="uil uil-eye-slash pw_hide"></i>
+              
             </div>
             <div class="option_field">
               <span class="checkbox">
