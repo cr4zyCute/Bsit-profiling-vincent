@@ -1,14 +1,13 @@
 const formOpenBtn = document.querySelector(".login-btn"), 
-  home = document.querySelector(".home"),
   formContainer = document.querySelector(".form_container"),
   formCloseBtn = document.querySelector(".form_close"),
- 
-  loginBtn = document.querySelector("#login"),
   pwShowHide = document.querySelectorAll(".pw_hide");
 
+// Function to toggle the visibility of the form
 formOpenBtn.addEventListener("click", () => formContainer.classList.add("active")); 
 formCloseBtn.addEventListener("click", () => formContainer.classList.remove("active")); 
 
+// Show/hide password logic
 pwShowHide.forEach((icon) => {
   icon.addEventListener("click", () => {
     let getPwInput = icon.parentElement.querySelector("input");
@@ -22,11 +21,9 @@ pwShowHide.forEach((icon) => {
   });
 });
 
-signupBtn.addEventListener("click", (e) => {
-  e.preventDefault();
-  formContainer.classList.add("active");
-});
-loginBtn?.addEventListener("click", (e) => { 
-  e.preventDefault();
-  formContainer.classList.remove("active");
+window.addEventListener("DOMContentLoaded", () => {
+  const hasError = document.getElementById("hasError").value;
+  if (hasError === "true") {
+    formContainer.classList.add("active");
+  }
 });
