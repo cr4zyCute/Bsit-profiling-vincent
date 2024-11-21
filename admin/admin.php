@@ -1,17 +1,16 @@
-
 <?php
-
-use PSpell\Dictionary;
-
 session_start();
-include('../database/db.php'); // Remove any trailing spaces or incorrect path
+include('../database/db.php'); 
 
+if (!isset($_SESSION['admin_email'])) {
 
-// Fetch student data
+    header('Location: adminlogin.php');
+    exit();
+}
 $query = "SELECT student.*, logincredentials.email 
           FROM student 
           LEFT JOIN logincredentials 
-          ON student.id = logincredentials.student_id"; // Adjust column names if necessary
+          ON student.id = logincredentials.student_id"; 
 $result = mysqli_query($conn, $query);
 $result1 = mysqli_query($conn, $query);
 
@@ -52,7 +51,7 @@ if ($count_result) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
+    <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../css/admindashboard.css">
 
 </head>
@@ -66,7 +65,7 @@ if ($count_result) {
                 <li><a href="javascript:void(0);" data-section="dashboard" onclick="showSection('notification')">Notification</a></li>
                 <li><a href="javascript:void(0);" data-section="student" onclick="showSection('student')">Students</a></li>
                 <li><a href="javascript:void(0);" data-section="setting" onclick="showSection('setting')">Settings</a></li>
-                <li><a href="logout.php">Logout</a></li>
+                <li><a href="adminlogout.php">Logout</a></li>
             </ul>
         </aside>
 
