@@ -79,8 +79,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         echo "Error updating record: " . mysqli_error($conn);
     }
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+    $student_id = $_POST['student_id'];
 
+    $deleteQuery = "DELETE FROM student WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $deleteQuery);
+
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "i", $student_id);
+        if (mysqli_stmt_execute($stmt)) {
+             $_SESSION['delete_success'] = true;
+            header("Location: admin.php");
+            exit();
+        } else {
+            echo "Error deleting student: " . mysqli_error($conn);
+        }
+        mysqli_stmt_close($stmt);
+    } else {
+        echo "Failed to prepare the delete query.";
+    }
+}
+
+if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) {
+    echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelector('.modal-section.success').style.display = 'flex';
+            });
+          </script>";
+    unset($_SESSION['delete_success']);
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -230,10 +259,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                                                 </a></li>
                                 </form>
 
-                                <form method="POST" action="" onsubmit="return confirmDelete();">
+
+                                <a href="#modal-section">
+                                <form method="POST" action="admin.php" onsubmit="return confirmDelete(event);">
                                     <input type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
-                                    <button class="deletebtn" type="submit" name="action" value="delete"><i class="fa-solid fa-trash"></i></button>
+                                    <input type="hidden" name="action" value="delete">
+                                    <button class="deletebtn" type="submit">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </form>
+
+                        </a>
+
                             </td>
                         </tr>
                     <?php } ?>
@@ -247,11 +284,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             </div>
 
         </main>
-
-       
-
     </div>
+
+<section id="modal-section" class="modal-section" style="display: none;">
+    <span class="overlay" onclick="closeModal();"></span>
+    <div class="modal-box">
+      <i class="fa-solid fa-circle-exclamation" style="font-size: 50px; color:red;" ></i>
+        <h2>Notice</h2>
+        <h3>Are you sure you want to delete this student?</h3>
+        <div class="buttons">
+            <button class="close-btn" onclick="confirmDeletion();">OK</button>
+            <button class="close-btn" onclick="closeModal();">Cancel</button>
+        </div>
+    </div>
+</section>
+
+<section class="modal-section success" style="display: none;">
+    <span class="overlay" onclick="closeModal();"></span>
+    <div class="modal-box">
+        <i class="fa-regular fa-circle-check" style="font-size: 50px; color:green;"></i>
+        <h2>Success</h2>
+        <h3>Deleted Successfully!</h3>
+        <div class="buttons">
+            <a href="admin.php">
+            <button class="close-btn" onclick="closeModal();">OK</button>
+            </a>
+        </div>
+    </div>
+</section>
+
+    
     <script>
+        function closeModal() {
+    const modals = document.querySelectorAll('.modal-section');
+    modals.forEach(modal => modal.style.display = 'none');
+    formToSubmit = null;
+}
+
+        
+    let formToSubmit = null;
+
+    function confirmDelete(event) {
+        event.preventDefault();
+        formToSubmit = event.target;
+        document.getElementById('modal-section').style.display = 'flex';
+        return false;
+    }
+
+    function confirmDeletion() {
+        if (formToSubmit) {
+            formToSubmit.submit();
+        }
+        closeModal();
+    }
+
+    function closeModal() {
+        document.getElementById('modal-section').style.display = 'none';
+        formToSubmit = null;
+    }
         function openModal(student) {
         showSection('edit-student');
         document.getElementById('edit-student-id').value = student.id;

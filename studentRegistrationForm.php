@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
  <section class="modal-section">
     <span class="overlay"></span>
     <div class="modal-box">
-        <i class="fa-regular fa-circle-check"></i>
+        <i class="fa-regular fa-circle-check" style="font-size: 50px; color:green;" ></i>
         <h2>Success</h2>
         <h3>You have successfully Register!.</h3>
         <div class="buttons">
