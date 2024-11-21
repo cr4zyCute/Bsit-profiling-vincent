@@ -17,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    // Image upload handling
     $file_name = '';
  if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] == 0) {
     $file_name = $_FILES['profilePicture']['name'];
@@ -30,21 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-
-    // Insert into student table
     $sql = "INSERT INTO student (firstname, middlename, lastname, age, gender, phone, address, image) 
             VALUES ('$firstname', '$middlename', '$lastname', '$age', '$gender', '$phone', '$address', '$file_name')";
 
     if (mysqli_query($conn, $sql)) {
         $student_id = mysqli_insert_id($conn);
 
-        // Insert into loginCredentials table
         $credentials_sql = "INSERT INTO loginCredentials (student_id, email, password) 
                             VALUES ('$student_id', '$email', '$password')";
 
         if (mysqli_query($conn, $credentials_sql)) {
             echo "Student added successfully!";
-            header("Location: studentRegistrationForm.php");
+            header("Location: studentRegistrationForm.php?id=$id&update=success");
             exit();
         } else {
             echo "Error in loginCredentials: " . mysqli_error($conn);
@@ -52,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         echo "Error in student table: " . mysqli_error($conn);
     }
-
     mysqli_close($conn);
 }
 ?>
@@ -64,8 +59,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Form</title>
     <link rel="icon" href="./images/bsitlogo.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/studentRegistrationForm.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
+    <div class="back">
+    <a href="index.php">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+</div>
+<div class="type">
+        <p>Please Fill up the Following</p>
+    </div>
 
    <form action="" method="post" enctype="multipart/form-data">
     <div class="container">
@@ -110,25 +115,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
 
-        <div class="profile-section">
-            <div class="profile-pic">
-                <label for="profilePicture">Profile Picture:</label>
-               <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
-            </div>
-            <div class="login-section">
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit" name="submit" class="register-btn">Register</button>
-            </div>
+      <div class="profile-section">
+   <div class="profile-pic">
+    <img id="profileImage" src="./images/blank-profile-picture-973460_1280.png" alt="Profile Picture">
+    <label for="profilePicture">Profile Picture:</label>
+    <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
+    <button class="edit-btn" type="button" id="editButton"><i class="fa-solid fa-pen"></i></button>
+</div>
+
+    <div class="login-section">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
         </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" name="submit" class="register-btn">Register</button>
+    </div>
+</div>
+
     </div>
 </form>
+ <section class="modal-section">
+    <span class="overlay"></span>
+    <div class="modal-box">
+        <i class="fa-regular fa-circle-check"></i>
+        <h2>Success</h2>
+        <h3>You have successfully Register!.</h3>
+        <div class="buttons">
+            <a href="index.php">
+            <button class="close-btn">OK</button>
+            </a>
+        </div>
+    </div>
+</section>
+<script>
+   // Get references to elements
+    const profileInput = document.getElementById('profilePicture');
+    const profileImage = document.getElementById('profileImage');
+    const editButton = document.getElementById('editButton');
 
+    // Event listener for the "Edit" button
+    editButton.addEventListener('click', function() {
+        profileInput.click(); // Simulate a click on the file input
+    });
+
+    // Event listener for file selection
+    profileInput.addEventListener('change', function(event) {
+        const file = event.target.files[0]; // Get the selected file
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profileImage.src = e.target.result; // Update the image source
+            };
+            reader.readAsDataURL(file); // Read the file as a Data URL
+        }
+    });
+     document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const section = document.querySelector(".modal-section"),
+              overlay = document.querySelector(".overlay"),
+              closeBtn = document.querySelector(".close-btn");
+
+        // Show the modal if update is successful
+        if (urlParams.get('update') === 'success') {
+            section.classList.add("active");
+        }
+
+        // Close the modal when clicking overlay or close button
+        overlay.addEventListener("click", () => section.classList.remove("active"));
+        closeBtn.addEventListener("click", () => section.classList.remove("active"));
+
+        // Optionally, remove the 'update=success' parameter from the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    });
+</script>
 </body>
 </html>
