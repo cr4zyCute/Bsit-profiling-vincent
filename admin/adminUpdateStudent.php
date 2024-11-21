@@ -1,6 +1,26 @@
 <?php
 include('../database/db.php');
 
+// Fetch the student data based on the provided ID
+$student = null;
+
+if (isset($_GET['id'])) {
+    $id = intval($_GET['id']);
+    $query = "SELECT * FROM student WHERE id = $id";
+    $result = mysqli_query($conn, $query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $student = mysqli_fetch_assoc($result);
+    } else {
+        echo "Student not found!";
+        exit;
+    }
+} else {
+    echo "Invalid student ID!";
+    exit;
+}
+
+// Update logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $id = $_POST['student_id'];
     $firstname = $_POST['firstname'];
@@ -38,6 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         echo "Error updating record: " . mysqli_error($conn);
     }
 }
+
+
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+echo $id;  
+
+
 ?>
 
 <!DOCTYPE html>
@@ -45,44 +71,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Edit Student</title>
+    <link rel="stylesheet" href="../css/adminUpdateStudent.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
-<body>
-    <div id="edit-student" class="section-content" style="display: none;">
-    <h2>Edit Student</h2>
-    <form method="POST" action="studentUpdateForm.php" enctype="multipart/form-data">
-        <input type="hidden" id="edit-student-id" name="student_id">
-        
-        <label for="edit-firstname">First Name:</label>
-        <input type="text" id="edit-firstname" name="firstname" required>
-        
-        <label for="edit-middlename">Middle Name:</label>
-        <input type="text" id="edit-middlename" name="middlename">
-        
-        <label for="edit-lastname">Last Name:</label>
-        <input type="text" id="edit-lastname" name="lastname" required>
-        
-        <label for="edit-age">Age:</label>
-        <input type="number" id="edit-age" name="age" required>
-        
-        <label for="edit-gender">Gender:</label>
-        <select id="edit-gender" name="gender">
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>
-        
-        <label for="edit-phone">Contact:</label>
-        <input type="text" id="edit-phone" name="phone" required>
-        
-        <label for="edit-address">Address:</label>
-        <textarea id="edit-address" name="address" required></textarea>
-        
-        <label for="edit-profileImage">Profile Image:</label>
-        <input type="file" id="edit-profileImage" name="profileImage">
-        
-        <button type="submit" name="update">Save Changes</button>
-    </form>
+<div class="back">
+    <a href="admin.php?id=<?php echo $id; ?>#student">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
 </div>
 
+
+
+    <form action="" method="post" enctype="multipart/form-data">
+        <div class="container">
+            <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
+            
+            <div class="form-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstname">Firstname:</label>
+                        <input type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars($student['firstname']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="middlename">Middlename:</label>
+                        <input type="text" id="middlename" name="middlename" value="<?php echo htmlspecialchars($student['middlename']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastname">Lastname:</label>
+                        <input type="text" id="lastname" name="lastname" value="<?php echo htmlspecialchars($student['lastname']); ?>" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="age">Age:</label>
+                        <input type="number" id="age" name="age" value="<?php echo htmlspecialchars($student['age']); ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gender:</label>
+                        <select id="gender" name="gender" required>
+                            <option value="Male" <?php echo $student['gender'] === 'Male' ? 'selected' : ''; ?>>Male</option>
+                            <option value="Female" <?php echo $student['gender'] === 'Female' ? 'selected' : ''; ?>>Female</option>
+                            <option value="Others" <?php echo $student['gender'] === 'Others' ? 'selected' : ''; ?>>Others</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Contact Number:</label>
+                        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($student['phone']); ?>" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="address">Address:</label>
+                        <input type="text" id="address" name="address" value="<?php echo htmlspecialchars($student['address']); ?>" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-section">
+                <div class="profile-pic">
+                    <label for="profileImage">Profile Picture:</label>
+                    <input type="file" id="profileImage" name="profileImage" accept="image/*">
+                    <?php if (!empty($student['image'])) { ?>
+                        <img src="<?php echo $student['image']; ?>" alt="Profile Picture" style="max-width: 100px; margin-top: 10px;">
+                    <?php } ?>
+                </div>
+            </div>
+            
+            <button type="submit" name="update" class="update-btn">Update</button>
+        </div>
+    </form>
 </body>
 </html>

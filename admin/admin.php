@@ -221,11 +221,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                             <td><?php echo $row['email']; ?></td>
                             <td>
                            
-                                <form method="POST" action="studentUpdateForm.php">
-                                                <li><a href="#settings" onclick="showSection('settings')">
+                                <form method="POST" action="adminUpdateStudent.php">
+                                                <li><a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
                                                     <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
                                                 <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                   <i class="fa-solid fa-pen-to-square"></i> Edit
                                                 </button>
                                                 </a></li>
                                 </form>
@@ -245,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 <h2>Settings Content</h2>
                 <p>This is the content for managing settings.</p>
             </div>
-            
+
         </main>
 
        
@@ -253,10 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     </div>
     <script>
         function openModal(student) {
-        // Show the edit-student section
         showSection('edit-student');
-
-        // Populate the form fields with student data
         document.getElementById('edit-student-id').value = student.id;
         document.getElementById('edit-firstname').value = student.firstname;
         document.getElementById('edit-middlename').value = student.middlename || "";

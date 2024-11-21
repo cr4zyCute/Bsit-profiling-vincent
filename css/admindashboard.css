@@ -166,3 +166,98 @@ body {
         margin-left: 100px;
     }
 }
+#studentUpdate {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+#studentUpdate .container {
+    width: 100%;
+}
+
+#studentUpdate .form-section {
+    margin-bottom: 20px;
+}
+
+#studentUpdate .form-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+#studentUpdate .form-group {
+    flex: 1;
+}
+
+#studentUpdate .form-group label {
+    font-size: 14px;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#studentUpdate .form-group input,
+#studentUpdate .form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#studentUpdate .form-group.full-width {
+    width: 100%;
+}
+
+#studentUpdate .profile-section {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#studentUpdate .profile-section label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#studentUpdate .profile-section img {
+    max-width: 100px;
+    border-radius: 50%;
+    margin-top: 10px;
+}
+
+#studentUpdate .update-btn {
+    background-color: #4caf50;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#studentUpdate .update-btn:hover {
+    background-color: #45a049;
+}
+
+@media (max-width: 768px) {
+    #studentUpdate .form-row {
+        flex-direction: column;
+    }
+
+    #studentUpdate .form-group {
+        width: 100%;
+    }
+}
