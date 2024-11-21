@@ -53,15 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                     WHERE id = $id";
 
     if (mysqli_query($conn, $updateQuery)) {
-        header("Location: admin.php");
+        header("Location: adminUpdateStudent.php?id=$id&update=success");
     } else {
         echo "Error updating record: " . mysqli_error($conn);
     }
 }
-
-
-$id = isset($_GET['id']) ? $_GET['id'] : null;
-echo $id;  
 
 
 ?>
@@ -76,15 +72,16 @@ echo $id;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 </head>
-<div class="back">
-    <a href="admin.php?id=<?php echo $id; ?>#student">
+<body>
+    <div class="back">
+    <a href="admin.php">
         <i class="fa-solid fa-arrow-left"></i>
     </a>
 </div>
 
 
+   <form action="?id=<?php echo $student['id']; ?>" method="post" enctype="multipart/form-data">
 
-    <form action="" method="post" enctype="multipart/form-data">
         <div class="container">
             <input type="hidden" name="student_id" value="<?php echo $student['id']; ?>">
             
@@ -142,5 +139,40 @@ echo $id;
             <button type="submit" name="update" class="update-btn">Update</button>
         </div>
     </form>
+    <section class="modal-section">
+    <span class="overlay"></span>
+    <div class="modal-box">
+        <i class="fa-regular fa-circle-check"></i>
+        <h2>Success</h2>
+        <h3>You have successfully updated the student!.</h3>
+        <div class="buttons">
+            <a href="admin.php">
+            <button class="close-btn">OK, Close</button>
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const section = document.querySelector(".modal-section"),
+              overlay = document.querySelector(".overlay"),
+              closeBtn = document.querySelector(".close-btn");
+
+        // Show the modal if update is successful
+        if (urlParams.get('update') === 'success') {
+            section.classList.add("active");
+        }
+
+        // Close the modal when clicking overlay or close button
+        overlay.addEventListener("click", () => section.classList.remove("active"));
+        closeBtn.addEventListener("click", () => section.classList.remove("active"));
+
+        // Optionally, remove the 'update=success' parameter from the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    });
+</script>
+
 </body>
 </html>
