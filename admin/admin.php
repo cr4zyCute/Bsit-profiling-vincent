@@ -14,14 +14,12 @@ $query = "SELECT student.*, logincredentials.email
 $result = mysqli_query($conn, $query);
 $result1 = mysqli_query($conn, $query);
 
-
-// Check for query success
 if (!$result) {
     die("Error fetching data: " . mysqli_error($conn));
 }
  if (!empty($_FILES['profileImage']['name'])) {
         $imageName = basename($_FILES['profileImage']['name']);
-        $imagePath = 'images-data/' . $imageName;
+        $imagePath = '../images-data/' . $imageName;
 
         if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
             
@@ -41,7 +39,45 @@ if ($count_result) {
     $count_data = mysqli_fetch_assoc($count_result);
     $student_count = $count_data['student_count'];
 } else {
-    $student_count = 0; // Default to 0 if the query fails
+    $student_count = 0;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+    $id = $_POST['student_id'];
+    $firstname = $_POST['firstname'];
+    $middlename = $_POST['middlename'];
+    $lastname = $_POST['lastname'];
+    $age = $_POST['age'];
+    $gender = $_POST['gender'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
+    $imageQuery = "";
+
+    if (!empty($_FILES['profileImage']['name'])) {
+        $imageName = basename($_FILES['profileImage']['name']);
+        $imagePath = '../images-data/' . $imageName;
+
+        if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+            $imageQuery = ", image = '$imagePath'";
+        }
+    }
+
+    $updateQuery = "UPDATE student SET 
+                    firstname = '$firstname', 
+                    middlename = '$middlename', 
+                    lastname = '$lastname', 
+                    age = '$age', 
+                    gender = '$gender', 
+                    phone = '$phone', 
+                    address = '$address' 
+                    $imageQuery 
+                    WHERE id = $id";
+
+    if (mysqli_query($conn, $updateQuery)) {
+        header("Location: admin.php");
+    } else {
+        echo "Error updating record: " . mysqli_error($conn);
+    }
 }
 
 ?>
@@ -52,12 +88,12 @@ if ($count_result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+    <link rel="icon" href="../images/bsitlogo.png">
     <link rel="stylesheet" href="../css/admindashboard.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
     <div class="container">
-        <!-- Sidebar -->
         <aside class="sidebar">
             <h2>Admin Panel</h2>
             <ul>
@@ -69,7 +105,6 @@ if ($count_result) {
             </ul>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
             <div id="dashboard" class="section-content">
                 <h2>Dashboard</h2>
@@ -88,8 +123,6 @@ if ($count_result) {
                 <p>on going </p>
             </div>
         </div>
-
-        <!-- Tables -->
         <div class="tables">
             <div class="table-container">
                 <center>
@@ -170,52 +203,69 @@ if ($count_result) {
                 <th>Edit</th>
             </tr>
         </thead>
-       <tbody>
-    <?php
-    if ($result && mysqli_num_rows($result1) > 0) {
-        while ($row = mysqli_fetch_assoc($result1)) {
-            echo "<tr>";
-            
-            // Display profile container with image or fallback
-            echo "<td>";
-            echo "<div class='profile-container'>";
-            if (!empty($row['image']) && file_exists('../' . $row['image'])) {
-                echo "<img src='../" . htmlspecialchars($row['image']) . "' style='width:120px; height:120px;' alt='Profile' class='profile-image' id='profileDisplay'>";
-            } else {
-                echo "<span>No Image</span>";
-            }
-            echo "<input type='file' id='profileImageUpload' name='profileImage' accept='image/*' onchange='previewImage(event)' hidden>";
-            echo "</div>";
-            echo "</td>";
+         <tbody>
+                    <?php while ($row = mysqli_fetch_assoc($result1)) { ?>
+                        <tr>
+                            <td><?php echo $row['id']; ?></td>
+                          <td>
+                                <?php if (!empty($row['image'])) { ?>
+                                    <img src="<?php echo file_exists('../images-data/' . $row['image']) ? '../images-data/' . htmlspecialchars($row['image']) : htmlspecialchars($row['image']); ?>" style="width:120px; height:120px;">
+                                    
+                                <?php } ?>
+                            </td>
+                            <td><?php echo $row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']; ?></td>
+                            <td><?php echo $row['age']; ?></td>
+                            <td><?php echo $row['gender']; ?></td>
+                            <td><?php echo $row['phone']; ?></td>
+                            <td><?php echo $row['address']; ?></td>
+                            <td><?php echo $row['email']; ?></td>
+                            <td>
+                           
+                                <form method="POST" action="studentUpdateForm.php">
+                                                <li><a href="#settings" onclick="showSection('settings')">
+                                                    <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                                <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                </a></li>
+                                </form>
 
-            // Display other table columns
-            echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['age']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['gender']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['address']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-            echo "</tr>";
-        }
-    } else {
-        echo "<tr><td colspan='9' class='text-center'>No students found</td></tr>";
-    }
-    ?>
-</tbody>
-
-
+                                <form method="POST" action="" onsubmit="return confirmDelete();">
+                                    <input type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
+                                    <button class="deletebtn" type="submit" name="action" value="delete"><i class="fa-solid fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
     </table>
-
             </div>
 
             <div id="setting" class="section-content" style="display: none;">
                 <h2>Settings Content</h2>
                 <p>This is the content for managing settings.</p>
             </div>
+            
         </main>
+
+       
+
     </div>
     <script>
+        function openModal(student) {
+        // Show the edit-student section
+        showSection('edit-student');
+
+        // Populate the form fields with student data
+        document.getElementById('edit-student-id').value = student.id;
+        document.getElementById('edit-firstname').value = student.firstname;
+        document.getElementById('edit-middlename').value = student.middlename || "";
+        document.getElementById('edit-lastname').value = student.lastname;
+        document.getElementById('edit-age').value = student.age;
+        document.getElementById('edit-gender').value = student.gender;
+        document.getElementById('edit-phone').value = student.phone;
+        document.getElementById('edit-address').value = student.address;
+    }
         function showSection(section) {
             const sections = document.querySelectorAll(".section-content");
             const links = document.querySelectorAll(".sidebar ul li a");

@@ -19,16 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Image upload handling
     $file_name = '';
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $file_name = $_FILES['image']['name'];
-        $tempname = $_FILES['image']['tmp_name'];
-        $folder = 'images-data/' . $file_name;
-        
-        if (!move_uploaded_file($tempname, $folder)) {
-            echo "Failed to upload image.";
-            exit();
-        }
+ if (isset($_FILES['profilePicture']) && $_FILES['profilePicture']['error'] == 0) {
+    $file_name = $_FILES['profilePicture']['name'];
+    $tempname = $_FILES['profilePicture']['tmp_name'];
+    $folder = 'images-data/' . $file_name;
+
+    if (!move_uploaded_file($tempname, $folder)) {
+        echo "Failed to upload image.";
+        exit();
     }
+}
+
 
     // Insert into student table
     $sql = "INSERT INTO student (firstname, middlename, lastname, age, gender, phone, address, image) 
@@ -63,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registration Form</title>
     <link rel="icon" href="./images/bsitlogo.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/adminUpdateStudent.css">
 </head>
 
    <form action="" method="post" enctype="multipart/form-data">
@@ -112,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="profile-section">
             <div class="profile-pic">
                 <label for="profilePicture">Profile Picture:</label>
-                <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
+               <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
             </div>
             <div class="login-section">
                 <div class="form-group">

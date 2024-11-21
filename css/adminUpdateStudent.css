@@ -1,0 +1,77 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+/* Form Container */
+#edit-student {
+    width: 50%;
+    background: #ffffff;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: block; /* Ensure the form is visible */
+}
+
+/* Heading */
+#edit-student h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Labels */
+#edit-student label {
+    display: block;
+    margin: 10px 0 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+/* Inputs */
+#edit-student input[type="text"],
+#edit-student input[type="number"],
+#edit-student input[type="file"],
+#edit-student textarea,
+#edit-student select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Textarea */
+#edit-student textarea {
+    height: 100px;
+    resize: none;
+}
+
+/* Button */
+#edit-student button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#edit-student button:hover {
+    background-color: #218838;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #edit-student {
+        width: 90%;
+    }
+}
