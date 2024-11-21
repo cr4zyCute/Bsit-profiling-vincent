@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <i class="fa-solid fa-arrow-left"></i>
     </a>
 </div>
-<div class="type">
+    <div class="type">
         <p>Please Fill up the Following</p>
     </div>
 
