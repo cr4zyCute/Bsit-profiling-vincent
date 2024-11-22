@@ -108,8 +108,51 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
           </script>";
     unset($_SESSION['delete_success']);
 }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
+    $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
+    $middlename = mysqli_real_escape_string($conn, $_POST['middlename']);
+    $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
+    $age = mysqli_real_escape_string($conn, $_POST['age']);
+    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $imagePath = '';
 
+    // Handle Profile Image Upload
+    if (!empty($_FILES['profileImage']['name'])) {
+        $imageName = basename($_FILES['profileImage']['name']);
+        $imagePath = '../images-data/' . $imageName;
 
+        if (!move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+            echo "Failed to upload image.";
+            exit();
+        }
+    }
+
+    // Insert into student table
+    $insertStudentQuery = "INSERT INTO student (firstname, middlename, lastname, age, gender, phone, address, image)
+                           VALUES ('$firstname', '$middlename', '$lastname', '$age', '$gender', '$phone', '$address', '$imagePath')";
+
+    if (mysqli_query($conn, $insertStudentQuery)) {
+        $student_id = mysqli_insert_id($conn); // Get the inserted student's ID
+        
+        // Insert into loginCredentials table
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        $insertCredentialsQuery = "INSERT INTO logincredentials (student_id, email, password)
+                                   VALUES ('$student_id', '$email', '$hashedPassword')";
+
+        if (mysqli_query($conn, $insertCredentialsQuery)) {
+            header("Location: admin.php"); // Redirect to admin page
+            exit();
+        } else {
+            echo "Error inserting login credentials: " . mysqli_error($conn);
+        }
+    } else {
+        echo "Error inserting student: " . mysqli_error($conn);
+    }
+}
 
 ?>
 
@@ -224,7 +267,6 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
             <div id="student" class="section-content" style="display: none;">
                 <h2>Student List</h2>
                 <p>Manage Your students</p>
-
         <table>
         <thead>
             <tr>
@@ -240,6 +282,10 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
             </tr>
         </thead>
          <tbody id="student-table-body-student-section">
+            <div class="add-student-button">
+    <button onclick="showSection('add-student')">Add New Student</button>
+</div>
+
             <div class="search-container">
                 <input type="text" id="search-input-student-section" placeholder="Search students">
                 <button id="clear-btn-student-section" style="display: none;">✖</button>
@@ -287,6 +333,47 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                     <?php } ?>
                 </tbody>
     </table>
+    <div id="add-student" class="section-content" style="display: none;">
+    <h2>Add New Student</h2>
+    <form action="admin.php" method="POST" enctype="multipart/form-data">
+        <label for="firstname">First Name:</label>
+        <input type="text" id="firstname" name="firstname" required>
+        
+        <label for="middlename">Middle Name:</label>
+        <input type="text" id="middlename" name="middlename">
+        
+        <label for="lastname">Last Name:</label>
+        <input type="text" id="lastname" name="lastname" required>
+        
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+        
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+        </select>
+        
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required>
+        
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" required></textarea>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <label for="profileImage">Profile Image:</label>
+        <input type="file" id="profileImage" name="profileImage">
+        
+        <button type="submit" name="add-student">Add Student</button>
+    </form>
+</div>
+
             </div>
 
             <div id="setting" class="section-content" style="display: none;">
@@ -327,25 +414,32 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
     
     <script>
 
+        function showSection(section) {
+    const sections = document.querySelectorAll(".section-content");
+    const links = document.querySelectorAll(".sidebar ul li a");
+    sections.forEach(sec => sec.style.display = "none");
+    links.forEach(link => link.classList.remove("active"));
+    document.getElementById(section).style.display = "block";
+    const activeLink = document.querySelector(`.sidebar ul li a[data-section="${section}"]`);
+    if (activeLink) activeLink.classList.add("active");
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('search-input-student-section');
     const clearButton = document.getElementById('clear-btn-student-section');
     const tableBody = document.getElementById('student-table-body-student-section');
-
-    // Store the original table content
     const originalTableContent = tableBody.innerHTML;
-
     searchInput.addEventListener('input', () => {
         clearButton.style.display = searchInput.value ? 'inline' : 'none';
         if (!searchInput.value.trim()) {
-            tableBody.innerHTML = originalTableContent; // Restore the original table
+            tableBody.innerHTML = originalTableContent; 
         }
     });
-
-    clearButton.addEventListener('click', () => {
+ clearButton.addEventListener('click', () => {
         searchInput.value = ''; 
         clearButton.style.display = 'none'; 
-        tableBody.innerHTML = originalTableContent; // Restore the original table
+        tableBody.innerHTML = originalTableContent;
         searchInput.focus(); 
     });
 });
