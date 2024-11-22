@@ -78,11 +78,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User</title>
+    <title>User - Student Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="css/studentProfile.css">
-    <link rel="stylesheet" href="css/editprofile.css">
-    <link rel="icon" href="image/bsitlogo.png">
+    <link rel="stylesheet" href="css/studenProfile.css">
+    <link rel="icon" href="./images/bsitlogo.png">
 </head>
 <body>
     <div class="top-buttons">
@@ -95,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="id-card">
         <div class="profile-container">
             <?php if (!empty($student['image'])): ?>
-                <img src="<?php echo htmlspecialchars($student['image']); ?>" alt="Profile" class="profile-image" id="profileImage">
-
+<img src="<?php echo htmlspecialchars($student['image']); ?>" alt="Profile" class="profile-image" id="profileImage">
+                 
             <?php else: ?>
                 <p>No profile image available.</p>
             <?php endif; ?>
@@ -166,7 +165,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script src="js/editprofile.js"></script>
+    
     <script>
+        function openEditModal() {
+    document.getElementById('editModal').classList.add('active');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+}
+
         function previewImage(event) {
             const file = event.target.files[0];
             const reader = new FileReader();

@@ -202,7 +202,7 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                             <th>Name</th>
                             <th>Email</th>
                             <th>Message</th>
-                            <th>Time</th>
+                            <th>Approval</th>
                         </tr>
                     </thead>
                     <tbody>
