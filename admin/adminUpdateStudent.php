@@ -1,7 +1,6 @@
 <?php
 include('../database/db.php');
 
-// Fetch the student data based on the provided ID
 $student = null;
 
 if (isset($_GET['id'])) {
@@ -20,7 +19,7 @@ if (isset($_GET['id'])) {
     exit;
 }
 
-// Update logic
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $id = $_POST['student_id'];
     $firstname = $_POST['firstname'];

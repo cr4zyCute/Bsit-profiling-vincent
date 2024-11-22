@@ -283,7 +283,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         </thead>
          <tbody id="student-table-body-student-section">
             <div class="add-student-button">
-                <button onclick="showSection('add-student')">Add New Student</button>
+                <a href="adminaddStudent.php">
+                    <button>Add New Student</button>
+                </a>
             </div>
 
             <div class="search-container">
@@ -332,7 +334,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
                     <?php } ?>
                 </tbody>
     </table>
-    <div id="add-student" class="section-content" style="display: none;">
+   
+
+            </div>
+
+            <div id="setting" class="section-content" style="display: none;">
+                <h2>Settings Content</h2>
+                <p>This is the content for managing settings.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <section id="modal-section add-student" class="modal-section" style="display: none;">
+    <span class="overlay" onclick="closeModal();"></span>
+    <div class="modal-box">
+      <div id="add-student" class="section-content" style="display: none;">
     <h2>Add New Student</h2>
     <form action="admin.php" method="POST" enctype="multipart/form-data">
         <label for="firstname">First Name:</label>
@@ -372,16 +389,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         <button type="submit" name="add-student">Add Student</button>
     </form>
 </div>
-
-            </div>
-
-            <div id="setting" class="section-content" style="display: none;">
-                <h2>Settings Content</h2>
-                <p>This is the content for managing settings.</p>
-            </div>
-
-        </main>
     </div>
+</section>
 
 <section id="modal-section" class="modal-section" style="display: none;">
     <span class="overlay" onclick="closeModal();"></span>
