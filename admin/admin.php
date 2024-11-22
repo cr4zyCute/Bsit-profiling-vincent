@@ -108,6 +108,9 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
           </script>";
     unset($_SESSION['delete_success']);
 }
+
+
+
 ?>
 
 
@@ -119,6 +122,7 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
     <title>Admin Dashboard</title>
     <link rel="icon" href="../images/bsitlogo.png">
     <link rel="stylesheet" href="../css/admindashboard.css">
+     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
@@ -135,6 +139,10 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
         </aside>
 
         <main class="main-content">
+               <div class="search-container">
+    <input type="text" id="search-input" placeholder="Search students...">
+    <button id="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+</div>
             <div id="dashboard" class="section-content">
                 <h2>Dashboard</h2>
                   <div class="cards">
@@ -168,8 +176,10 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                 <th>Address</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="student-table-body" >
             <?php
+            $sql = "SELECT * FROM student";
+                $query = mysqli_query($conn,$sql);
             if ($result && mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<tr>";
@@ -217,6 +227,10 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
             <div id="student" class="section-content" style="display: none;">
                 <h2>Student List</h2>
                 <p>Manage Your students</p>
+            <div class="search-container">
+    <input type="text" id="search-input" placeholder="Search students...">
+    <button id="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+</div>
 
         <table>
         <thead>
@@ -315,6 +329,24 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
 
     
     <script>
+$(document).ready(function () {
+    $('#search-input').on('keyup', function () {
+        var query = $(this).val();
+        $.ajax({
+            url: 'searchStudent.php',
+            method: 'GET', 
+            data: { query: query },
+            success: function (response) {
+                $('#student-table-body').html(response); 
+            },
+            error: function () {
+                console.error('Error fetching search results.');
+            }
+        });
+    });
+});
+
+
         function closeModal() {
     const modals = document.querySelectorAll('.modal-section');
     modals.forEach(modal => modal.style.display = 'none');
