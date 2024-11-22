@@ -139,10 +139,7 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
         </aside>
 
         <main class="main-content">
-               <div class="search-container">
-    <input type="text" id="search-input" placeholder="Search students...">
-    <button id="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-</div>
+       
             <div id="dashboard" class="section-content">
                 <h2>Dashboard</h2>
                   <div class="cards">
@@ -227,16 +224,12 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
             <div id="student" class="section-content" style="display: none;">
                 <h2>Student List</h2>
                 <p>Manage Your students</p>
-            <div class="search-container">
-    <input type="text" id="search-input" placeholder="Search students...">
-    <button id="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-</div>
 
         <table>
         <thead>
             <tr>
-                <th>Student Profile</th>
                 <th>Student ID</th>
+                <th>Student Profile</th>
                 <th>Name</th>
                 <th>Age</th>
                 <th>Gender</th>
@@ -246,7 +239,13 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                 <th>Edit</th>
             </tr>
         </thead>
-         <tbody>
+         <tbody id="student-table-body-student-section">
+            <div class="search-container">
+    <input type="text" id="search-input-student-section" placeholder="Search students in this section...">
+    <button id="search-btn-student-section"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+    
+</div>
+            
                     <?php while ($row = mysqli_fetch_assoc($result1)) { ?>
                         <tr>
                             <td><?php echo $row['id']; ?></td>
@@ -268,7 +267,7 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                                                 <li><a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
                                                     <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
                                                 <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
-                                                   <i class="fa-solid fa-pen-to-square"></i> Edit
+                                                   <i class="fa-solid fa-pen-to-square"></i>
                                                 </button>
                                                 </a></li>
                                 </form>
@@ -329,22 +328,21 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
 
     
     <script>
-$(document).ready(function () {
-    $('#search-input').on('keyup', function () {
+
+    $('#search-input-student-section').on('keyup', function () {
         var query = $(this).val();
         $.ajax({
             url: 'searchStudent.php',
-            method: 'GET', 
+            method: 'GET',
             data: { query: query },
             success: function (response) {
-                $('#student-table-body').html(response); 
+                $('#student-table-body-student-section').html(response);
             },
             error: function () {
                 console.error('Error fetching search results.');
             }
         });
     });
-});
 
 
         function closeModal() {
