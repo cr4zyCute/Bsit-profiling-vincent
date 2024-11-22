@@ -341,3 +341,14 @@ body {
 .search-container button:hover {
     background-color: #0056b3;
 }
+#clear-btn-student-section {
+    background: none;
+    border: none;
+    font-size: 1em;
+    color: #666;
+    cursor: pointer;
+    margin-left: 5px;
+}
+#clear-btn-student-section:hover {
+    color: #333;
+}

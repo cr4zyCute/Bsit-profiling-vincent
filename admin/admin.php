@@ -241,10 +241,10 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
         </thead>
          <tbody id="student-table-body-student-section">
             <div class="search-container">
-    <input type="text" id="search-input-student-section" placeholder="Search students in this section...">
-    <button id="search-btn-student-section"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-    
-</div>
+                <input type="text" id="search-input-student-section" placeholder="Search students">
+                <button id="clear-btn-student-section" style="display: none;">✖</button>
+                <button id="search-btn-student-section"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+            </div>
             
                     <?php while ($row = mysqli_fetch_assoc($result1)) { ?>
                         <tr>
@@ -264,15 +264,13 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                             <td>
                            
                                 <form method="POST" action="adminUpdateStudent.php">
-                                                <li><a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
+                                                <li style="list-style-type: none;" ><a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
                                                     <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
                                                 <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
                                                    <i class="fa-solid fa-pen-to-square"></i>
                                                 </button>
                                                 </a></li>
                                 </form>
-
-
                                 <a href="#modal-section">
                                 <form method="POST" action="admin.php" onsubmit="return confirmDelete(event);">
                                     <input type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
@@ -329,8 +327,33 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
     
     <script>
 
-    $('#search-input-student-section').on('keyup', function () {
-        var query = $(this).val();
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('search-input-student-section');
+    const clearButton = document.getElementById('clear-btn-student-section');
+    const tableBody = document.getElementById('student-table-body-student-section');
+
+    // Store the original table content
+    const originalTableContent = tableBody.innerHTML;
+
+    searchInput.addEventListener('input', () => {
+        clearButton.style.display = searchInput.value ? 'inline' : 'none';
+        if (!searchInput.value.trim()) {
+            tableBody.innerHTML = originalTableContent; // Restore the original table
+        }
+    });
+
+    clearButton.addEventListener('click', () => {
+        searchInput.value = ''; 
+        clearButton.style.display = 'none'; 
+        tableBody.innerHTML = originalTableContent; // Restore the original table
+        searchInput.focus(); 
+    });
+});
+
+$('#search-input-student-section').on('keyup', function () {
+    var query = $(this).val().trim();
+
+    if (query) {
         $.ajax({
             url: 'searchStudent.php',
             method: 'GET',
@@ -342,7 +365,11 @@ if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) 
                 console.error('Error fetching search results.');
             }
         });
-    });
+    } else {
+        const tableBody = document.getElementById('student-table-body-student-section');
+        tableBody.innerHTML = originalTableContent;
+    }
+});
 
 
         function closeModal() {
