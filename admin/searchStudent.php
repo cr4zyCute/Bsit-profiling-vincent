@@ -25,9 +25,13 @@ if (isset($_GET['query'])) {
      <td>' . htmlspecialchars($row['id']) . '</td>
             <td>';
             
-        if (!empty($row['image'])) {
-                  echo '<img src="' . (htmlspecialchars('../images-data/' . $row['image']) ? '../images-data/' . htmlspecialchars($row['image']) : htmlspecialchars($row['image'])) . '" style="width:120px; height:120px;">';
-                }
+       $imagePath = '../images-data/' . htmlspecialchars($row['image']);
+if (!empty($row['image']) && file_exists($imagePath)) {
+    echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;">';
+} else {
+    echo '<img src="../images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image">';
+}
+
         echo '</td>
             <td>' . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . '</td>
             <td>' . htmlspecialchars($row['age']) . '</td>

@@ -40,13 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $imageName = basename($_FILES['profileImage']['name']);
         $imagePath = 'images-data/' . $imageName;
 
-        if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
-            $imageQueryPart = ", student.image = '$imagePath'"; 
-        } else {
-            echo "Failed to upload image.";
-            var_dump($_FILES); 
-            exit();
-        }
+       if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+    $imageQueryPart = ", student.image = '$imagePath'";
+} else {
+    echo "Failed to upload image.";
+    var_dump($_FILES); // Debug file upload
+    exit();
+}
+
     }
 
     $updateQuery = "
@@ -97,11 +98,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     <div class="id-card">
         <div class="profile-container">
-            <?php if (!empty($student['image'])): ?>
-<img src="<?php echo file_exists(htmlspecialchars($student['image'])) ? htmlspecialchars($student['image']) . '?v=' . time() : 'default-image.png'; ?>" style="width:120px; height:120px;">
-            <?php else: ?>
-                <p>No profile image available.</p>
-            <?php endif; ?>
+     <div class="profile-container">
+    <?php
+    $imagePath = 'images-data/' . htmlspecialchars($student['image']); // Adjust the path to match your structure
+    if (!empty($student['image']) && file_exists($imagePath)) {
+        echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image">';
+    } else {
+        echo '<img src="images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image">';
+    }
+    ?>
+</div>
+
+
+
         </div>
         <p class="id-number">ID Number: <?php echo $student['id'] ?></p>
         <div class="card-body">
@@ -125,8 +134,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="profile-card">
                 <span class="close-btn" onclick="closeEditModal()">X</span>
                 <div class="profile-picture">
-                    <img src="<?php echo file_exists(htmlspecialchars($student['image'])) ? htmlspecialchars($student['image']) . '?v=' . time() : 'default-image.png'; ?>" style="width:120px; height:120px;" id="profileDisplay">
-                    <input type="file" id="profileImageUpload" name="profileImage" accept="image/*" onchange="previewImage(event)" hidden>
+  <?php
+    $imagePath = 'images-data/' . htmlspecialchars($student['image']); // Adjust the path to match your structure
+    if (!empty($student['image']) && file_exists($imagePath)) {
+        echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image">';
+    } else {
+        echo '<img src="images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image" id="profileDisplay" >';
+    }
+    ?>                    <input type="file" id="profileImageUpload" name="profileImage" accept="image/*" onchange="previewImage(event)" hidden>
                     <div class="edit-btn" onclick="document.getElementById('profileImageUpload').click()">Edit</div>
                 </div>
                 

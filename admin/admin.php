@@ -120,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
     $password = mysqli_real_escape_string($conn, $_POST['password']);
     $imagePath = '';
 
-    // Handle Profile Image Upload
     if (!empty($_FILES['profileImage']['name'])) {
         $imageName = basename($_FILES['profileImage']['name']);
         $imagePath = '../images-data/' . $imageName;
