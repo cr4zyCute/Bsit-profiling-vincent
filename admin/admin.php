@@ -283,8 +283,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         </thead>
          <tbody id="student-table-body-student-section">
             <div class="add-student-button">
-    <button onclick="showSection('add-student')">Add New Student</button>
-</div>
+                <button onclick="showSection('add-student')">Add New Student</button>
+            </div>
 
             <div class="search-container">
                 <input type="text" id="search-input-student-section" placeholder="Search students">
@@ -309,24 +309,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
                             <td><?php echo $row['email']; ?></td>
                             <td>
                            
-                                <form method="POST" action="adminUpdateStudent.php">
-                                                <li style="list-style-type: none;" ><a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
-                                                    <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
-                                                <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
-                                                   <i class="fa-solid fa-pen-to-square"></i>
-                                                </button>
-                                                </a></li>
+                            <form method="POST" action="adminUpdateStudent.php">
+                                    <a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
+                                    <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                        <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                        </a>
                                 </form>
-                                <a href="#modal-section">
+                                <a href="#modal-section" class="deletebtn">
                                 <form method="POST" action="admin.php" onsubmit="return confirmDelete(event);">
-                                    <input type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
+                                    <input  type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
                                     <input type="hidden" name="action" value="delete">
-                                    <button class="deletebtn" type="submit">
+                                    <button  type="submit">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </form>
-
-                        </a>
+                            </a>
 
                             </td>
                         </tr>

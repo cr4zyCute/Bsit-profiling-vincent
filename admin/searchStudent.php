@@ -36,13 +36,13 @@ if (isset($_GET['query'])) {
             <td>' . htmlspecialchars($row['address']) . '</td>
             <td>' . htmlspecialchars($row['email']) . '</td>
             <td>
-                <form method="GET" action="adminUpdateStudent.php">
+                <form method="GET" action="adminUpdateStudent.php" class="edit-btn">
         <input type="hidden" name="id" value="' . htmlspecialchars($row['id']) . '">
         <button type="submit">
             <i class="fa-solid fa-pen-to-square"></i>
         </button>
     </form>
-                <form method="POST" action="admin.php" onsubmit="return confirmDelete(event);">
+                <form method="POST" action="admin.php" class="deletebtn" onsubmit="return confirmDelete(event);">
                     <input type="hidden" name="student_id" value="' . htmlspecialchars($row['id']) . '">
                     <input type="hidden" name="action" value="delete">
                     <button class="deletebtn" type="submit">

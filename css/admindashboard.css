@@ -17,13 +17,13 @@ body {
 
 .sidebar {
     width: 250px;
-    background-color: #2c3e50; /* Sidebar background color */
+    background-color: #2c3e50; 
     color: #fff;
     display: flex;
     flex-direction: column;
     padding: 20px;
     height: 100%;
-    border-radius: 0 20px 20px 0;
+    border-radius: 0 5px 5px 0;
 }
 
 .sidebar h2 {
@@ -351,4 +351,55 @@ body {
 }
 #clear-btn-student-section:hover {
     color: #333;
+}
+/* Edit Button */
+.edit-btn button {
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 12%;
+    background: linear-gradient(45deg, #3db63d, #9ae19d);
+    color: #000000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.edit-btn button:hover {
+    background: linear-gradient(45deg, #34d058, #28a745);
+    transform: scale(1.15);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+}
+
+/* Delete Button */
+.deletebtn button {
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    width: 60px;
+    height: 60px;
+    border-radius: 12%;
+    background: linear-gradient(45deg, #f05f5f, #dc3545);
+    color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.deletebtn button:hover {
+    background: linear-gradient(45deg, #c82333, #a71d2e);
+    transform: scale(1.15);
+    box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Icons inside buttons */
+button i {
+    font-size: 1.5rem;
+    margin: 0; 
 }
