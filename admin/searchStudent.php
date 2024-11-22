@@ -26,8 +26,8 @@ if (isset($_GET['query'])) {
             <td>';
             
         if (!empty($row['image'])) {
-            echo '<img src="' . (file_exists('../images-data/' . $row['image']) ? '../images-data/' . htmlspecialchars($row['image']) : htmlspecialchars($row['image'])) . '" style="width:120px; height:120px;">';
-        }
+                  echo '<img src="' . (htmlspecialchars('../images-data/' . $row['image']) ? '../images-data/' . htmlspecialchars($row['image']) : htmlspecialchars($row['image'])) . '" style="width:120px; height:120px;">';
+                }
         echo '</td>
             <td>' . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . '</td>
             <td>' . htmlspecialchars($row['age']) . '</td>

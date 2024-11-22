@@ -34,20 +34,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $address = mysqli_real_escape_string($conn, $_POST['address']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
 
+    $imageQueryPart = ""; // Initialize empty by default
+
     if (!empty($_FILES['profileImage']['name'])) {
         $imageName = basename($_FILES['profileImage']['name']);
         $imagePath = 'images-data/' . $imageName;
 
         if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
-
-            $imageQueryPart = ", student.image = '$imagePath'";
+            $imageQueryPart = ", student.image = '$imagePath'"; 
         } else {
             echo "Failed to upload image.";
+            var_dump($_FILES); 
             exit();
         }
-    } else {
-        $imageQueryPart = "";
     }
+
     $updateQuery = "
         UPDATE student 
         JOIN loginCredentials ON student.id = loginCredentials.student_id
@@ -58,13 +59,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             student.gender = '$gender',
             student.phone = '$phone',
             student.address = '$address',
-            loginCredentials.email = '$email',
+            loginCredentials.email = '$email'
             $imageQueryPart
         WHERE student.id = '$student_id'
     ";
 
     if (mysqli_query($conn, $updateQuery)) {
-        header("Location: profilePage.php");
+        header("Location: student.php");
         exit();
     } else {
         echo "Error updating profile: " . mysqli_error($conn);
@@ -84,18 +85,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link rel="icon" href="./images/bsitlogo.png">
 </head>
 <body>
+    <header>
     <div class="top-buttons">
-        <button onclick="openEditModal()" class="settings-btn">Edit Profile</button>
+        <button class="email-btn"><i class="fa-solid fa-envelope"></i></button>
+        <button onclick="openEditModal()" class="settings-btn"><i class="fa-solid fa-pen-to-square"></i></button>
         <a href="logout.php">
-            <button class="logout-btn">Log out</button>
+            <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
         </a>
     </div>
+    </header>
     
     <div class="id-card">
         <div class="profile-container">
             <?php if (!empty($student['image'])): ?>
-<img src="<?php echo htmlspecialchars($student['image']); ?>" alt="Profile" class="profile-image" id="profileImage">
-                 
+<img src="<?php echo file_exists(htmlspecialchars($student['image'])) ? htmlspecialchars($student['image']) . '?v=' . time() : 'default-image.png'; ?>" style="width:120px; height:120px;">
             <?php else: ?>
                 <p>No profile image available.</p>
             <?php endif; ?>
@@ -122,8 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="profile-card">
                 <span class="close-btn" onclick="closeEditModal()">X</span>
                 <div class="profile-picture">
-                   <img src="<?php echo htmlspecialchars($student['image']); ?>" alt="Profile" class="profile-image" id="profileImage">
-
+                    <img src="<?php echo file_exists(htmlspecialchars($student['image'])) ? htmlspecialchars($student['image']) . '?v=' . time() : 'default-image.png'; ?>" style="width:120px; height:120px;" id="profileDisplay">
                     <input type="file" id="profileImageUpload" name="profileImage" accept="image/*" onchange="previewImage(event)" hidden>
                     <div class="edit-btn" onclick="document.getElementById('profileImageUpload').click()">Edit</div>
                 </div>

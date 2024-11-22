@@ -299,8 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
                             <td><?php echo $row['id']; ?></td>
                           <td>
                                 <?php if (!empty($row['image'])) { ?>
-                                    <img src="<?php echo file_exists('../images-data/' . $row['image']) ? '../images-data/' . htmlspecialchars($row['image']) : htmlspecialchars($row['image']); ?>" style="width:120px; height:120px;">
-                                    
+                            <img src="<?php $imagePath = '../images-data/' . $row['image'];echo file_exists($imagePath) ? htmlspecialchars($imagePath) : '../' . htmlspecialchars($row['image']); ?>" class="profile-image" id="profileDisplay" alt="Profile" style="width:120px; height:120px;">                                     
                                 <?php } ?>
                             </td>
                             <td><?php echo $row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']; ?></td>
