@@ -469,3 +469,20 @@ button i {
 .modal-box form button[type="submit"]:hover {
     background-color: #45a049;
 }
+.table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.table-container table th,
+.table-container table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.table-container table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}

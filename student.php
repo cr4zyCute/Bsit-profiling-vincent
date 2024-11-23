@@ -72,6 +72,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "Error updating profile: " . mysqli_error($conn);
     }
 }
+
+
+// Ensure the student is logged in
+if (!isset($_SESSION['student_id'])) {
+    header('Location: login.php'); // Redirect to login if not logged in
+    exit();
+}
+
+$student_id = $_SESSION['student_id'];
+
+// Fetch the current approval status
+$statusQuery = "SELECT status FROM approvals WHERE student_id = $student_id ORDER BY created_at DESC LIMIT 1";
+$statusResult = mysqli_query($conn, $statusQuery);
+$approvalStatus = null;
+
+if ($statusResult && mysqli_num_rows($statusResult) > 0) {
+    $statusRow = mysqli_fetch_assoc($statusResult);
+    $approvalStatus = $statusRow['status'];
+}
+
+
 ?>
 
 
@@ -88,7 +109,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <header>
     <div class="top-buttons">
-        <button class="email-btn">Send Approval<i class="fa-regular fa-paper-plane"></i></button>
+        <div>
+            <!-- <form action="./admin/sendApproval.php" method="POST">
+                 <button class="email-btn"type="submit" name="sendApproval" >Send Approval<i class="fa-regular fa-paper-plane"></i></button>
+                 </form> -->
+                  <div class="approval-section">
+        <?php
+        if ($approvalStatus === 'pending') {
+            echo "<button disabled>Waiting for Approval</button>";
+        } elseif ($approvalStatus === 'approved') {
+            echo "<p>Your request has been approved.<br>You are now Enrolled</p>";
+        } else {
+       
+            echo "
+               <form action='./admin/sendApproval.php' method='POST'>
+                 <button class='email-btn'type='submit' name='sendApproval' >Send Approval<i class='fa-regular fa-paper-plane'></i></button>
+                 </form>
+            ";
+        }
+        ?>
+    </div>
+            
+        </div>
+
+       
         <button onclick="openEditModal()" class="settings-btn"><i class="fa-solid fa-pen-to-square"></i></button>
         <a href="logout.php">
             <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>

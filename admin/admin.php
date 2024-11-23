@@ -7,10 +7,16 @@ if (!isset($_SESSION['admin_email'])) {
     header('Location: adminlogin.php');
     exit();
 }
-$query = "SELECT student.*, logincredentials.email 
-          FROM student 
-          LEFT JOIN logincredentials 
-          ON student.id = logincredentials.student_id"; 
+$query = "
+    SELECT student.*, 
+           logincredentials.email, 
+           approvals.status 
+    FROM student
+    LEFT JOIN logincredentials 
+    ON student.id = logincredentials.student_id
+    LEFT JOIN approvals 
+    ON student.id = approvals.student_id";
+          
 $result = mysqli_query($conn, $query);
 $result1 = mysqli_query($conn, $query);
 
@@ -41,6 +47,31 @@ if ($count_result) {
 } else {
     $student_count = 0;
 }
+$count_queryPending = "SELECT COUNT(*) AS pending_count FROM approvals WHERE status = 'pending'";
+$count_resultPending = $conn->query($count_queryPending);
+
+$pending_count = 0; 
+if ($count_resultPending && $count_resultPending->num_rows > 0) {
+    $row = $count_resultPending->fetch_assoc();
+    $pending_count = $row['pending_count'];
+} else {
+  
+    echo "Error fetching pending count: " . $conn->error;
+}
+
+$count_queryApprove = "SELECT COUNT(*) AS approved_count FROM approvals WHERE status = 'approved'";
+$count_resultApprove = $conn->query($count_queryApprove);
+
+$approved_count = 0; // Default value
+if ($count_resultApprove && $count_resultApprove->num_rows > 0) {
+    $row = $count_resultApprove->fetch_assoc();
+    $approved_count = $row['approved_count'];
+} else {
+    // Output an error if the query fails
+    echo "Error fetching approved count: " . $conn->error;
+}
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     $id = $_POST['student_id'];
@@ -130,20 +161,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         }
     }
 
-    // Insert into student table
     $insertStudentQuery = "INSERT INTO student (firstname, middlename, lastname, age, gender, phone, address, image)
                            VALUES ('$firstname', '$middlename', '$lastname', '$age', '$gender', '$phone', '$address', '$imagePath')";
 
     if (mysqli_query($conn, $insertStudentQuery)) {
-        $student_id = mysqli_insert_id($conn); // Get the inserted student's ID
-        
-        // Insert into loginCredentials table
+        $student_id = mysqli_insert_id($conn); 
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
         $insertCredentialsQuery = "INSERT INTO logincredentials (student_id, email, password)
                                    VALUES ('$student_id', '$email', '$hashedPassword')";
 
         if (mysqli_query($conn, $insertCredentialsQuery)) {
-            header("Location: admin.php"); // Redirect to admin page
+            header("Location: admin.php"); 
             exit();
         } else {
             echo "Error inserting login credentials: " . mysqli_error($conn);
@@ -152,9 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         echo "Error inserting student: " . mysqli_error($conn);
     }
 }
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -191,12 +217,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         </div>
 
             <div class="card">
-                <h3>on going</h3>
-                <p>on going</p>
-            </div>
+            <h3><?php echo $pending_count; ?></h3>
+            <p>Pending Approval</p>
+        </div>
+
             <div class="card">
-                <h3>on going</h3>
-                <p>on going </p>
+               <h3><?php echo $approved_count; ?></h3>
+                <p>Enrolled</p>
             </div>
         </div>
         <div class="tables">
@@ -209,10 +236,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
             <tr>
                 <th>Student ID</th>
                 <th>Name</th>
-                <th>Age</th>
-                <th>Gender</th>
-                <th>Contact</th>
-                <th>Address</th>
+                <th>Email</th>
+                <th>Status</th>
+               
             </tr>
         </thead>
         <tbody id="student-table-body" >
@@ -224,10 +250,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($row['id']) . "</td>";
                     echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['age']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['gender']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['phone']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['address']) . "</td>";
+                     echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['status'] ?? 'No Status') . "</td>"; // Show status or "No Status"
                     echo "</tr>";
                 }
             } else {
@@ -240,28 +264,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
 
         </div>
             </div>
-               <div id="notification" class="section-content" style="display: none;">
-                <h2>notification Content</h2>
-                notification
-                <div class="table-container">
-                <h5>Recent Contact Requests</h5>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Message</th>
-                            <th>Approval</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="4" class="text-center">No data available</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            </div>
+              <div id="notification" class="section-content" style="display: none;">
+    <h2>Approval Requests</h2>
+    <div class="table-container">
+        <h5>Recent Approval Requests</h5>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Request Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+ <?php
+$approvalQuery = "
+    SELECT approvals.id AS approval_id, approvals.status, approvals.created_at, 
+           student.firstname, student.middlename, student.lastname, student.id AS student_id, 
+           logincredentials.email 
+    FROM approvals 
+    JOIN student ON approvals.student_id = student.id 
+    JOIN logincredentials ON student.id = logincredentials.student_id
+    ORDER BY approvals.created_at DESC";
+$approvalResult = mysqli_query($conn, $approvalQuery);
+
+if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+    while ($row = mysqli_fetch_assoc($approvalResult)) {
+        echo "<tr>";
+        echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+        echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+        echo "<td>" . ucfirst(htmlspecialchars($row['status'])) . "</td>";
+        echo "<td>";
+
+        // Check if the approval status is still pending
+        if (strtolower($row['status']) === 'pending') {
+            echo "<form method='POST' action='handleApproval.php' enctype='multipart/form-data' style='display:inline-block;'>
+                    <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
+                    <input type='file' name='approval_picture' accept='image/*' required>
+                    <button type='submit' name='action' value='approve'>Approve</button>
+                  </form>
+                  <form method='POST' action='handleApproval.php' style='display:inline-block;'>
+                    <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
+                    <button type='submit' name='action' value='reject'>Reject</button>
+                  </form>";
+        } elseif (strtolower($row['status']) === 'approved') {
+            echo "<span style='color: green; font-weight: bold;'>Approved</span>";
+        } elseif (strtolower($row['status']) === 'rejected') {
+            echo "<span style='color: red; font-weight: bold;'>Rejected</span>";
+        }
+
+        echo "</td>";
+        echo "</tr>";
+    }
+} else {
+    echo "<tr><td colspan='6' class='text-center'>No approval requests found</td></tr>";
+}
+?>
+
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
 
             <div id="student" class="section-content" style="display: none;">
                 <h2>Student List</h2>
