@@ -73,10 +73,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
+$approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
+$approvalResult = mysqli_query($conn, $approvalQuery);
+
+
+$approvalPicture = null;
+
+if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+    $approvalData = mysqli_fetch_assoc($approvalResult);
+    $approvalPicture = $approvalData['picture'];
+}
 
 // Ensure the student is logged in
 if (!isset($_SESSION['student_id'])) {
-    header('Location: login.php'); // Redirect to login if not logged in
+    header('Location: login.php'); 
     exit();
 }
 
@@ -109,6 +119,8 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
 <body>
     <header>
     <div class="top-buttons">
+        <button onclick="openImageModal()" class="view-btn">View Image</button>
+
         <div>
             <!-- <form action="./admin/sendApproval.php" method="POST">
                  <button class="email-btn"type="submit" name="sendApproval" >Send Approval<i class="fa-regular fa-paper-plane"></i></button>
@@ -139,6 +151,38 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
         </a>
     </div>
     </header>
+    <div class="modal-overlay" id="viewImageModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeImageModal()">X</span>
+        <div class="image-container">
+<div class="image-container">
+    <?php
+    if (!empty($approvalPicture)) {
+        // Construct the file path
+        $adminImagePath = '../admin/uploads/approval_pictures/' . htmlspecialchars($approvalPicture);
+
+        // Output the generated path for debugging (optional)
+        echo "Generated Path: " . htmlspecialchars($adminImagePath) . "<br>";
+
+        // Check if the file exists
+        if (file_exists($adminImagePath)) {
+            // Display the image
+            echo '<img src="' . htmlspecialchars($adminImagePath) . '?v=' . time() . '" style="width:100%; max-height:400px;" alt="Image Sent by Admin">';
+        } else {
+            echo '<p>Image file does not exist on the server.</p>';
+        }
+    } else {
+        echo '<p>No image has been sent by the admin yet.</p>';
+    }
+    ?>
+</div>
+
+
+</div>
+
+    </div>
+</div>
+
     
     <div class="id-card">
         <div class="profile-container">
@@ -152,8 +196,6 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
     }
     ?>
 </div>
-
-
 
         </div>
         <p class="id-number">ID Number: <?php echo $student['id'] ?></p>
@@ -228,6 +270,16 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
     <script src="js/editprofile.js"></script>
     
     <script>
+
+        function openImageModal() {
+    document.getElementById('viewImageModal').classList.add('active');
+}
+
+function closeImageModal() {
+    document.getElementById('viewImageModal').classList.remove('active');
+}
+
+
         function openEditModal() {
     document.getElementById('editModal').classList.add('active');
 }
