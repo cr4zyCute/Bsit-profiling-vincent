@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $imageQueryPart = ", student.image = '$imagePath'";
 } else {
     echo "Failed to upload image.";
-    var_dump($_FILES); // Debug file upload
+    var_dump($_FILES); 
     exit();
 }
 
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <body>
     <header>
     <div class="top-buttons">
-        <button class="email-btn"><i class="fa-solid fa-envelope"></i></button>
+        <button class="email-btn">Send Approval<i class="fa-regular fa-paper-plane"></i></button>
         <button onclick="openEditModal()" class="settings-btn"><i class="fa-solid fa-pen-to-square"></i></button>
         <a href="logout.php">
             <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <span class="close-btn" onclick="closeEditModal()">X</span>
                 <div class="profile-picture">
   <?php
-    $imagePath = 'images-data/' . htmlspecialchars($student['image']); // Adjust the path to match your structure
+    $imagePath = 'images-data/' . htmlspecialchars($student['image']); 
     if (!empty($student['image']) && file_exists($imagePath)) {
         echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image">';
     } else {
