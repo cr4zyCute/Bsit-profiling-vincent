@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
 <section id="home">
     <img src="./images/IMG_3564.jpg" alt="">
-<section id="formContainer" class="<?= $_SERVER['REQUEST_METHOD'] === 'POST' ? 'show' : '' ?>">
+<section id="formContainer" class="<?= !empty(trim($error_message)) ? 'show' : '' ?>">
     <div class="form_container">
         <i class="uil uil-times form_close" onclick="toggleLoginForm()"></i>
         <div class="form login_form">
@@ -176,12 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         </div>
     </footer>
 <script src="./js/index.js" ></script>
-<script >
-    function toggleLoginForm() {
-    const formContainer = document.getElementById('formContainer');
-    formContainer.classList.toggle('show');
-}
-
+<script type="text/javascript">
     window.addEventListener('scroll', reveal);
 function reveal(){
     var reveals = document.querySelectorAll('.reveal')
@@ -198,7 +193,6 @@ function reveal(){
         }
     }
 }
-
     document.addEventListener('DOMContentLoaded', () => {
             const errorMessage = document.getElementById('errorMessage');
             if (errorMessage) {

@@ -1,8 +1,8 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    height: 100vh; /* Make body take full viewport height */
+    background-color: #0b0217;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -18,9 +18,10 @@ body {
 
 .type p{
     font-size: 3em;
+    color: white;
     display: inline-block;
     letter-spacing: 0.1em;
-    border-right: solid 3px black ;
+    border-right: solid 3px rgb(252, 249, 249) ;
     width: 0;
     overflow: hidden;
     white-space: nowrap;
@@ -35,9 +36,9 @@ body {
     }
 }
 @keyframes blink {
-    form-group{ border-color: black }
+    form-group{ border-color: rgb(255, 255, 255) }
     50%{ border-color: transparent; }
-    100% { border-color: black; }
+    100% { border-color: rgb(255, 255, 255); }
 }
 
 .container {

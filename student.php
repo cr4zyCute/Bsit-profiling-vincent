@@ -164,13 +164,13 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
         $approvalPicture = $approvalData['picture']; // Path from the database
         
         // Debugging information
-        echo '<p>Debug: Image Path (Database): ' . htmlspecialchars($approvalPicture) . '</p>';
-        echo '<p>File exists? ' . (file_exists($approvalPicture) ? 'Yes' : 'No') . '</p>';
+        //echo '<p>Debug: Image Path (Database): ' . htmlspecialchars($approvalPicture) . '</p>';
+        echo '<p>' . (file_exists($approvalPicture) ? 'You are now Enrolled' : '') . '</p>';
    
         if (!empty($approvalPicture) && file_exists($approvalPicture)) {
   
             $webPath = str_replace('../', '', $approvalPicture);
-            echo '<img src="' . htmlspecialchars($webPath) . '?v=' . time() . '" style="width:120px; height:120px;" alt="Admin Sent Image">';
+            echo '<img src="' . htmlspecialchars($webPath) . '?v=' . time() . '" style="width:650px; height:600px;" alt="Admin Sent Image">';
         } else {
             echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
         }
