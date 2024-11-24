@@ -110,35 +110,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         echo "Error updating record: " . mysqli_error($conn);
     }
 }
+
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
     $student_id = $_POST['student_id'];
 
-    $deleteQuery = "DELETE FROM student WHERE id = ?";
-    $stmt = mysqli_prepare($conn, $deleteQuery);
+    mysqli_begin_transaction($conn);
 
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "i", $student_id);
-        if (mysqli_stmt_execute($stmt)) {
-             $_SESSION['delete_success'] = true;
-            header("Location: admin.php");
-            exit();
-        } else {
-            echo "Error deleting student: " . mysqli_error($conn);
-        }
-        mysqli_stmt_close($stmt);
-    } else {
-        echo "Failed to prepare the delete query.";
+    try {
+        $deleteApprovalsQuery = "DELETE FROM approvals WHERE student_id = ?";
+        $stmtApprovals = mysqli_prepare($conn, $deleteApprovalsQuery);
+        mysqli_stmt_bind_param($stmtApprovals, "i", $student_id);
+        mysqli_stmt_execute($stmtApprovals);
+        mysqli_stmt_close($stmtApprovals);
+
+        $deleteStudentQuery = "DELETE FROM student WHERE id = ?";
+        $stmtStudent = mysqli_prepare($conn, $deleteStudentQuery);
+        mysqli_stmt_bind_param($stmtStudent, "i", $student_id);
+        mysqli_stmt_execute($stmtStudent);
+        mysqli_stmt_close($stmtStudent);
+
+        mysqli_commit($conn);
+
+        $_SESSION['delete_success'] = true; // Set success flag
+        header("Location: admin.php");
+        exit();
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        echo "Error deleting student: " . $e->getMessage();
     }
 }
 
+// Check for delete success and pass data to modal
+$showSuccessModal = false;
 if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) {
-    echo "<script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelector('.modal-section.success').style.display = 'flex';
-            });
-          </script>";
-    unset($_SESSION['delete_success']);
-}
+    $showSuccessModal = true;
+    unset($_SESSION['delete_success']); // Clear session variable
+}   
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
     $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
     $middlename = mysqli_real_escape_string($conn, $_POST['middlename']);
@@ -280,51 +291,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
                 </tr>
             </thead>
             <tbody>
- <?php
-$approvalQuery = "
-    SELECT approvals.id AS approval_id, approvals.status, approvals.created_at, 
-           student.firstname, student.middlename, student.lastname, student.id AS student_id, 
-           logincredentials.email 
-    FROM approvals 
-    JOIN student ON approvals.student_id = student.id 
-    JOIN logincredentials ON student.id = logincredentials.student_id
-    ORDER BY approvals.created_at DESC";
-$approvalResult = mysqli_query($conn, $approvalQuery);
+    <?php
+    $approvalQuery = "
+        SELECT approvals.id AS approval_id, approvals.status, approvals.created_at, 
+            student.firstname, student.middlename, student.lastname, student.id AS student_id, 
+            logincredentials.email 
+        FROM approvals 
+        JOIN student ON approvals.student_id = student.id 
+        JOIN logincredentials ON student.id = logincredentials.student_id
+        ORDER BY approvals.created_at DESC";
+    $approvalResult = mysqli_query($conn, $approvalQuery);
 
-if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
-    while ($row = mysqli_fetch_assoc($approvalResult)) {
-        echo "<tr>";
-        echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-        echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
-        echo "<td>" . ucfirst(htmlspecialchars($row['status'])) . "</td>";
-        echo "<td>";
+    if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+        while ($row = mysqli_fetch_assoc($approvalResult)) {
+            echo "<tr>";
+            echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+            echo "<td>" . ucfirst(htmlspecialchars($row['status'])) . "</td>";
+            echo "<td>";
+            if (strtolower($row['status']) === 'pending') {
+                echo "<form method='POST' action='handleApproval.php' enctype='multipart/form-data' style='display:inline-block;'>
+                        <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
+                        <input type='file' name='approval_picture' accept='image/*' required>
+                        <button type='submit' name='action' value='approve'>Approve</button>
+                    </form>
+                    <form method='POST' action='handleApproval.php' style='display:inline-block;'>
+                        <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
+                        <button type='submit' name='action' value='reject'>Reject</button>
+                    </form>";
+            } elseif (strtolower($row['status']) === 'approved') {
+                echo "<span style='color: green; font-weight: bold;'>Approved</span>";
+            } elseif (strtolower($row['status']) === 'rejected') {
+                echo "<span style='color: red; font-weight: bold;'>Rejected</span>";
+            }
 
-        // Check if the approval status is still pending
-        if (strtolower($row['status']) === 'pending') {
-            echo "<form method='POST' action='handleApproval.php' enctype='multipart/form-data' style='display:inline-block;'>
-                    <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
-                    <input type='file' name='approval_picture' accept='image/*' required>
-                    <button type='submit' name='action' value='approve'>Approve</button>
-                  </form>
-                  <form method='POST' action='handleApproval.php' style='display:inline-block;'>
-                    <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
-                    <button type='submit' name='action' value='reject'>Reject</button>
-                  </form>";
-        } elseif (strtolower($row['status']) === 'approved') {
-            echo "<span style='color: green; font-weight: bold;'>Approved</span>";
-        } elseif (strtolower($row['status']) === 'rejected') {
-            echo "<span style='color: red; font-weight: bold;'>Rejected</span>";
+            echo "</td>";
+            echo "</tr>";
         }
-
-        echo "</td>";
-        echo "</tr>";
+    } else {
+        echo "<tr><td colspan='6' class='text-center'>No approval requests found</td></tr>";
     }
-} else {
-    echo "<tr><td colspan='6' class='text-center'>No approval requests found</td></tr>";
-}
-?>
+    ?>
 
 
             </tbody>
@@ -473,7 +482,7 @@ if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
     </div>
 </section>
 
-<section class="modal-section success" style="display: none;">
+<section class="modal-section success" style="display: none;" data-show="<?= $showSuccessModal ? 'true' : 'false'; ?>">
     <span class="overlay" onclick="closeModal();"></span>
     <div class="modal-box">
         <i class="fa-regular fa-circle-check" style="font-size: 50px; color:green;"></i>
@@ -481,7 +490,7 @@ if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
         <h3>Deleted Successfully!</h3>
         <div class="buttons">
             <a href="admin.php">
-            <button class="close-btn" onclick="closeModal();">OK</button>
+                <button class="close-btn" onclick="closeModal();">OK</button>
             </a>
         </div>
     </div>
@@ -540,6 +549,21 @@ $('#search-input-student-section').on('keyup', function () {
         tableBody.innerHTML = originalTableContent;
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const successModal = document.querySelector(".modal-section.success");
+    if (successModal && successModal.dataset.show === "true") {
+        successModal.style.display = "flex";
+    }
+});
+
+function closeModal() {
+    const successModal = document.querySelector(".modal-section.success");
+    if (successModal) {
+        successModal.style.display = "none";
+    }
+}
+
 
 
         function closeModal() {

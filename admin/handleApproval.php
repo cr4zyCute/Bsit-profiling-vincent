@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'approve' && isset($_FILES['approval_picture'])) {
-        $uploadDir = '../uploads/approval_pictures/';
+        $uploadDir = 'uploads/approval_pictures/';
         $uploadFile = $uploadDir . basename($_FILES['approval_picture']['name']);
 
         // Ensure the upload directory exists

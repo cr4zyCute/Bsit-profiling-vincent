@@ -154,36 +154,34 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
     <div class="modal-overlay" id="viewImageModal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeImageModal()">X</span>
-        <div class="image-container">
+
 <div class="image-container">
     <?php
-    if (!empty($approvalPicture)) {
-        // Construct the file path
-        $adminImagePath = '../admin/uploads/approval_pictures/' . htmlspecialchars($approvalPicture);
+    $approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
+$approvalResult = mysqli_query($conn, $approvalQuery);
 
-        // Output the generated path for debugging (optional)
-        echo "Generated Path: " . htmlspecialchars($adminImagePath) . "<br>";
+$approvalPicture = null;
+if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+    $approvalData = mysqli_fetch_assoc($approvalResult);
+    $approvalPicture = $approvalData['picture']; 
+}
 
-        // Check if the file exists
-        if (file_exists($adminImagePath)) {
-            // Display the image
-            echo '<img src="' . htmlspecialchars($adminImagePath) . '?v=' . time() . '" style="width:100%; max-height:400px;" alt="Image Sent by Admin">';
-        } else {
-            echo '<p>Image file does not exist on the server.</p>';
-        }
+   $adminImagePath = '../admin/uploads/approval_pictures/' . htmlspecialchars($approvalPicture);
+
+    if (!empty($approvalPicture) && file_exists($adminImagePath)) {
+        echo '<img src="' . $adminImagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Admin Sent Image">';
     } else {
-        echo '<p>No image has been sent by the admin yet.</p>';
+        echo 'Admin Still not Sending something! Please Wait For your Approval';
     }
     ?>
 </div>
 
 
-</div>
+
 
     </div>
 </div>
 
-    
     <div class="id-card">
         <div class="profile-container">
      <div class="profile-container">
