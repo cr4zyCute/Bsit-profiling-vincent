@@ -45,9 +45,9 @@ body {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-    align-items: center; /* Vertically center items */
+    align-items: center; 
     width: 100%;
-    max-width: 900px; /* Adjust max width to fit your content */
+    max-width: 900px; 
     padding: 20px;
     background: #fff;
     border-radius: 8px;
@@ -59,12 +59,10 @@ body {
     flex: 1 1 60%;
     padding: 20px;
     display: flex;
-    flex-direction: column; /* Stack items vertically */
-    justify-content: center; /* Vertically align content */
+    flex-direction: column; 
+    justify-content: center;
     border-right: 1px solid #ccc;
 }
-
-
 .form-row {
     display: flex;
     justify-content: space-between;
@@ -100,15 +98,12 @@ input:focus, select:focus {
     outline: none;
     border-color: #007BFF;
 }
-/* Profile Section */
 .profile-section {
     flex: 1 1 35%;
     padding: 20px;
     text-align: center;
     position: relative;
 }
-
-/* Profile Picture */
 .profile-pic {
     position: relative;
     bottom: 55%;
@@ -129,15 +124,13 @@ input:focus, select:focus {
     object-fit: cover;
     border-radius: 50%;
 }
-
-
 .edit-btn {
     position: absolute;
     bottom: 10px;
     right: 10px;
     width: 40px;
     height: 40px;
-    background-color: #FFA500; /* Orange color */
+    background-color: #FFA500; 
     color: #fff;
     font-size: 14px;
     font-weight: bold;
@@ -155,7 +148,6 @@ input:focus, select:focus {
     background-color: #e69500;
 }
 
-/* Login Section: Vertical Alignment */
 .login-section {
     display: flex;
     flex-direction: column;
@@ -186,7 +178,6 @@ input:focus, select:focus {
     background-color: #0056b3;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -202,12 +193,8 @@ input:focus, select:focus {
     flex: 1 1 60%;
     padding: 20px;
     margin-right: 20px; 
-  
     border-radius: 8px;
- 
-   
 }
-
 .profile-section {
     flex: 1 1 35%;
     padding: 20px;
@@ -217,7 +204,6 @@ input:focus, select:focus {
     border: 1px solid #ccc;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
 }
-
 .profile-pic {
     position: relative;
     display: inline-block;

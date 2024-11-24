@@ -11,7 +11,6 @@ if (!empty($_SESSION['student_id'])) {
         JOIN loginCredentials ON student.id = loginCredentials.student_id 
         WHERE student.id = '$student_id'
     ";
-
     $result = mysqli_query($conn, $query);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -20,36 +19,31 @@ if (!empty($_SESSION['student_id'])) {
         echo "Student profile not found."; 
         exit();
     }
-} else {
-    header("Location: loginForm.php");
-    exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
-    $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
-    $age = mysqli_real_escape_string($conn, $_POST['age']);
-    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
-    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-    $address = mysqli_real_escape_string($conn, $_POST['address']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-
-    $imageQueryPart = ""; // Initialize empty by default
-
-    if (!empty($_FILES['profileImage']['name'])) {
-        $imageName = basename($_FILES['profileImage']['name']);
-        $imagePath = 'images-data/' . $imageName;
+    } else {
+        header("Location: loginForm.php");
+        exit();
+    }
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+        $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
+        $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
+        $age = mysqli_real_escape_string($conn, $_POST['age']);
+        $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+        $address = mysqli_real_escape_string($conn, $_POST['address']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $imageQueryPart = ""; 
+        if (!empty($_FILES['profileImage']['name'])) {
+            $imageName = basename($_FILES['profileImage']['name']);
+            $imagePath = 'images-data/' . $imageName;
 
        if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
     $imageQueryPart = ", student.image = '$imagePath'";
-} else {
-    echo "Failed to upload image.";
-    var_dump($_FILES); 
-    exit();
-}
-
+    } else {
+        echo "Failed to upload image.";
+        var_dump($_FILES); 
+        exit();
     }
-
+    }
     $updateQuery = "
         UPDATE student 
         JOIN loginCredentials ON student.id = loginCredentials.student_id
@@ -64,45 +58,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $imageQueryPart
         WHERE student.id = '$student_id'
     ";
-
-    if (mysqli_query($conn, $updateQuery)) {
-        header("Location: student.php");
-        exit();
-    } else {
-        echo "Error updating profile: " . mysqli_error($conn);
+        if (mysqli_query($conn, $updateQuery)) {
+            header("Location: student.php");
+            exit();
+        } else {
+            echo "Error updating profile: " . mysqli_error($conn);
+        }
     }
-}
+    $approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
+    $approvalResult = mysqli_query($conn, $approvalQuery);
 
-$approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
-$approvalResult = mysqli_query($conn, $approvalQuery);
+    $approvalPicture = null;
 
+    if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+        $approvalData = mysqli_fetch_assoc($approvalResult);
+        $approvalPicture = $approvalData['picture'];
+    }
+    if (!isset($_SESSION['student_id'])) {
+        header('Location: login.php'); 
+        exit();
+    }
+    $student_id = $_SESSION['student_id'];
+    $statusQuery = "SELECT status FROM approvals WHERE student_id = $student_id ORDER BY created_at DESC LIMIT 1";
+    $statusResult = mysqli_query($conn, $statusQuery);
+    $approvalStatus = null;
 
-$approvalPicture = null;
-
-if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
-    $approvalData = mysqli_fetch_assoc($approvalResult);
-    $approvalPicture = $approvalData['picture'];
-}
-
-// Ensure the student is logged in
-if (!isset($_SESSION['student_id'])) {
-    header('Location: login.php'); 
-    exit();
-}
-
-$student_id = $_SESSION['student_id'];
-
-// Fetch the current approval status
-$statusQuery = "SELECT status FROM approvals WHERE student_id = $student_id ORDER BY created_at DESC LIMIT 1";
-$statusResult = mysqli_query($conn, $statusQuery);
-$approvalStatus = null;
-
-if ($statusResult && mysqli_num_rows($statusResult) > 0) {
-    $statusRow = mysqli_fetch_assoc($statusResult);
-    $approvalStatus = $statusRow['status'];
-}
-
-
+        if ($statusResult && mysqli_num_rows($statusResult) > 0) {
+            $statusRow = mysqli_fetch_assoc($statusResult);
+            $approvalStatus = $statusRow['status'];
+        }
 ?>
 
 
@@ -118,141 +102,131 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
 </head>
 <body>
     <header>
-    <div class="top-buttons">
-        <button onclick="openImageModal()" class="view-btn">View Image</button>
-
-        <div>
-            <!-- <form action="./admin/sendApproval.php" method="POST">
-                 <button class="email-btn"type="submit" name="sendApproval" >Send Approval<i class="fa-regular fa-paper-plane"></i></button>
-                 </form> -->
-                  <div class="approval-section">
-        <?php
-        if ($approvalStatus === 'pending') {
-            echo "<button disabled>Waiting for Approval</button>";
-        } elseif ($approvalStatus === 'approved') {
-            echo "<p>Your request has been approved.<br>You are now Enrolled</p>";
-        } else {
-       
-            echo "
-               <form action='./admin/sendApproval.php' method='POST'>
-                 <button class='email-btn'type='submit' name='sendApproval' >Send Approval<i class='fa-regular fa-paper-plane'></i></button>
-                 </form>
-            ";
-        }
-        ?>
-    </div>
-            
+        <div class="top-buttons">
+            <button onclick="openImageModal()" class="view-btn">View Image</button>
+                <div>
+                    <!-- <form action="./admin/sendApproval.php" method="POST">
+                        <button class="email-btn"type="submit" name="sendApproval" >Send Approval<i class="fa-regular fa-paper-plane"></i></button>
+                                </form> -->
+                    <div class="approval-section">
+                        <?php
+                            if ($approvalStatus === 'pending') {
+                                echo "<button disabled>Waiting for Approval</button>";
+                            } elseif ($approvalStatus === 'approved') {
+                                echo "<p>Your request has been approved.</p>";
+                            } else {
+                                echo "
+                                <form action='./admin/sendApproval.php' method='POST'>
+                                    <button class='email-btn'type='submit' name='sendApproval' >Send Approval<i class='fa-regular fa-paper-plane'></i></button>
+                                </form>
+                                ";
+                            }
+                        ?>
+                    </div>  
+                </div>
+            <button onclick="openEditModal()" class="settings-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+                <a href="logout.php">
+                    <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </a>
         </div>
-
-       
-        <button onclick="openEditModal()" class="settings-btn"><i class="fa-solid fa-pen-to-square"></i></button>
-        <a href="logout.php">
-            <button class="logout-btn"><i class="fa-solid fa-right-from-bracket"></i></button>
-        </a>
-    </div>
     </header>
     <div class="modal-overlay" id="viewImageModal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeImageModal()">X</span>
-<div class="image-container">
-    <?php
-    $approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
-    $approvalResult = mysqli_query($conn, $approvalQuery);
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeImageModal()">X</span>
+                <div class="image-container">
+                    <?php
+                        $approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
+                        $approvalResult = mysqli_query($conn, $approvalQuery);
 
-    if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
-        $approvalData = mysqli_fetch_assoc($approvalResult);
-        $approvalPicture = $approvalData['picture']; // Path from the database
-        
-        // Debugging information
-        //echo '<p>Debug: Image Path (Database): ' . htmlspecialchars($approvalPicture) . '</p>';
-        echo '<p>' . (file_exists($approvalPicture) ? 'You are now Enrolled' : '') . '</p>';
-   
-        if (!empty($approvalPicture) && file_exists($approvalPicture)) {
-  
-            $webPath = str_replace('../', '', $approvalPicture);
-            echo '<img src="' . htmlspecialchars($webPath) . '?v=' . time() . '" style="width:650px; height:600px;" alt="Admin Sent Image">';
-        } else {
-            echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
-        }
-    } else {
-        echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
-    }
-    ?>
-</div>
+                        if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+                            $approvalData = mysqli_fetch_assoc($approvalResult);
+                            $approvalPicture = $approvalData['picture']; 
 
-
-
+                            echo '<p>' . (file_exists($approvalPicture) ? 'You are now Enrolled' : '') . '</p>';
+                    
+                            if (!empty($approvalPicture) && file_exists($approvalPicture)) {
+                    
+                                $webPath = str_replace('../', '', $approvalPicture);
+                                echo '<img src="' . htmlspecialchars($webPath) . '?v=' . time() . '" style="width:650px; height:600px;" alt="Admin Sent Image">';
+                            } else {
+                                echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
+                            }
+                        } else {
+                            echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
+                        }
+                    ?>
+                </div>
+        </div>
     </div>
-</div>
-
     <div class="id-card">
         <div class="profile-container">
      <div class="profile-container">
-    <?php
-    $imagePath = 'images-data/' . htmlspecialchars($student['image']); // Adjust the path to match your structure
-    if (!empty($student['image']) && file_exists($imagePath)) {
-        echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image">';
-    } else {
-        echo '<img src="images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image">';
-    }
-    ?>
-</div>
+        <?php
+        $imagePath = 'images-data/' . htmlspecialchars($student['image']); 
+            if (!empty($student['image']) && file_exists($imagePath)) {
+                echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image">';
+            } else {
+                echo '<img src="images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image">';
+            }
+        ?>
+    </div>
 
         </div>
         <p class="id-number">ID Number: <?php echo $student['id'] ?></p>
-        <div class="card-body">
-            <div class="left-section info-box">
-                <p><strong>Name:</strong> <?php echo $student['firstname'] ?></p>
-                <p><strong>Last Name:</strong> <?php echo $student['lastname'] ?></p>
-                <p><strong>Age:</strong> <?php echo $student['age'] ?></p>
-                <p><strong>Gender:</strong> <?php echo $student['gender'] ?></p>
-            </div>
-            <div class="separator"></div>
-            <div class="right-section info-box">
-                <p><strong>Address:</strong> <?php echo $student['address'] ?></p>
-                <p><strong>Email:</strong> <?php echo $student['email'] ?></p>
-                <p><strong>Contact:</strong> <?php echo $student['phone'] ?></p>
+            <div class="card-body">
+                <div class="left-section info-box">
+                    <p><strong>Name:</strong> <?php echo $student['firstname'] ?></p>
+                    <p><strong>Last Name:</strong> <?php echo $student['lastname'] ?></p>
+                    <p><strong>Age:</strong> <?php echo $student['age'] ?></p>
+                    <p><strong>Gender:</strong> <?php echo $student['gender'] ?></p>
+                </div>
+                <div class="separator"></div>
+                <div class="right-section info-box">
+                    <p><strong>Address:</strong> <?php echo $student['address'] ?></p>
+                    <p><strong>Email:</strong> <?php echo $student['email'] ?></p>
+                    <p><strong>Contact:</strong> <?php echo $student['phone'] ?></p>
+                </div>
             </div>
         </div>
-    </div>
 
     <div class="modal-overlay" id="editModal">
         <form method="POST" enctype="multipart/form-data">
             <div class="profile-card">
                 <span class="close-btn" onclick="closeEditModal()">X</span>
-                <div class="profile-picture">
-  <?php
-    $imagePath = 'images-data/' . htmlspecialchars($student['image']); 
-    if (!empty($student['image']) && file_exists($imagePath)) {
-        echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image">';
-    } else {
-        echo '<img src="images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image" id="profileDisplay" >';
-    }
-    ?>                    <input type="file" id="profileImageUpload" name="profileImage" accept="image/*" onchange="previewImage(event)" hidden>
-                    <div class="edit-btn" onclick="document.getElementById('profileImageUpload').click()">Edit</div>
-                </div>
+                    <div class="profile-picture" >
+                        <?php
+                            $imagePath = 'images-data/' . htmlspecialchars($student['image']); 
+                                if (!empty($student['image']) && file_exists($imagePath)) {
+                                    echo '<img src="' . $imagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Profile Image" id="profileDisplay" >';
+                                } else {
+                                    echo '<img src="images-data/default-image.png" style="width:120px; height:120px;" alt="Default Image" id="profileDisplay" >';
+                                }
+                            ?>                    
+                            <input type="file" id="profileImageUpload" name="profileImage" accept="image/*" onchange="previewImage(event)" hidden>
+                        <div class="edit-btn" onclick="document.getElementById('profileImageUpload').click()">Edit</div>
+                    </div>
                 
                 <div class="info">
                     <div class="left">
                         <label for="firstname">First Name:</label>
-                        <input type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars($student['firstname']); ?>" required>
+                            <input type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars($student['firstname']); ?>" required>
 
-                        <label for="lastname">Last Name:</label>
+                            <label for="lastname">Last Name:</label>
                         <input type="text" id="lastname" name="lastname" value="<?php echo htmlspecialchars($student['lastname']); ?>" required>
                         
-                        <label for="address">Address:</label>
+                            <label for="address">Address:</label>
                         <input type="text" id="address" name="address" value="<?php echo htmlspecialchars($student['address']); ?>" required>
                     </div>
                     <div class="divider"></div>
                     <div class="right">
                         <label for="age">Age:</label>
-                        <input type="text" id="age" name="age" value="<?php echo htmlspecialchars($student['age']); ?>" required>
+                            <input type="text" id="age" name="age" value="<?php echo htmlspecialchars($student['age']); ?>" required>
 
                         <label for="gender">Gender:</label>
-                        <input type="text" id="gender" name="gender" value="<?php echo htmlspecialchars($student['gender']); ?>" required>
+                            <input type="text" id="gender" name="gender" value="<?php echo htmlspecialchars($student['gender']); ?>" required>
 
                         <label for="phone">Contact:</label>
-                        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($student['phone']); ?>" required>
+                            <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($student['phone']); ?>" required>
                     </div>
                 </div>
 
@@ -268,26 +242,38 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
         </form>
     </div>
 
+  
+
+<footer>
+    <p>&copy; 2024 BSIT. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+        </div>
+</footer>
+
     <script src="js/editprofile.js"></script>
-    
     <script>
 
         function openImageModal() {
-    document.getElementById('viewImageModal').classList.add('active');
-}
+            document.getElementById('viewImageModal').classList.add('active');
+        }
 
-function closeImageModal() {
-    document.getElementById('viewImageModal').classList.remove('active');
-}
+        function closeImageModal() {
+            document.getElementById('viewImageModal').classList.remove('active');
+        }
 
 
         function openEditModal() {
-    document.getElementById('editModal').classList.add('active');
-}
+             document.getElementById('editModal').classList.add('active');
+        }
 
-function closeEditModal() {
-    document.getElementById('editModal').classList.remove('active');
-}
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+        function closeModal() {
+            document.querySelector('.modal-section.success').style.display = 'none';
+        }
+
 
         function previewImage(event) {
             const file = event.target.files[0];

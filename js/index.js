@@ -3,11 +3,9 @@ const formOpenBtn = document.querySelector(".login-btn"),
   formCloseBtn = document.querySelector(".form_close"),
   pwShowHide = document.querySelectorAll(".pw_hide");
 
-// Function to toggle the visibility of the form
 formOpenBtn.addEventListener("click", () => formContainer.classList.add("active")); 
 formCloseBtn.addEventListener("click", () => formContainer.classList.remove("active")); 
 
-// Show/hide password logic
 pwShowHide.forEach((icon) => {
   icon.addEventListener("click", () => {
     let getPwInput = icon.parentElement.querySelector("input");

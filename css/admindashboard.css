@@ -14,7 +14,6 @@ body {
     display: flex;
     width: 100%;
 }
-
 .sidebar {
     width: 250px;
     background-color: #2c3e50; 
@@ -22,18 +21,23 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px;
-    height: 100%;
+    height: 100vh;
     border-radius: 0 5px 5px 0;
 }
 
 .sidebar h2 {
     text-align: center;
     margin-bottom: 20px;
+    font-size: 18px;
+    color: #ecf0f1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .sidebar ul {
     list-style: none;
     padding: 0;
+    margin: 0;
 }
 
 .sidebar ul li {
@@ -43,24 +47,52 @@ body {
 .sidebar ul li a {
     text-decoration: none;
     color: #ecf0f1;
-    padding: 10px;
-    display: block;
-    border-radius: 15px;
-    transition: background 0.3s, color 0.3s;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px; 
+    border-radius: 10px;
+    transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
 
+.sidebar ul li a i {
+    font-size: 18px; 
+}
 .sidebar ul li a:hover {
-    background-color: #34495e; /* Hover effect */
-    width: 150%; 
+    background-color: #34495e; 
+    color: #fff;
+    transform: scale(1.02); 
 }
-
 .sidebar ul li a.active {
     background-color: #feffff; 
     color: #2c3e50;
-    width: 150%;  
-         
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+.sidebar ul li a.active i {
+    color: #2c3e50;
 }
 
+.admin-panel-header {
+  display: flex;
+  align-items: center; 
+  gap: 10px; 
+  margin-bottom: 20px;
+}
+
+.admin-icon {
+  width: 120px;
+  height: 120px; 
+    position: relative;
+    left: 20%;
+}
+
+.admin-panel-header h2 {
+  font-size: 24px; 
+  color: #333; 
+  margin: 0;
+}
 .main-content {
     flex: 1;
     padding: 20px;
@@ -95,8 +127,6 @@ body {
             font-size: 1rem;
             color: #f0f3f5;
         }
-
-        /* Tables */
         .tables {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -134,10 +164,6 @@ body {
         table tr:hover {
             background-color: #f9f9f9;
         }
-
-
-
-/* Responsive Adjustments */
 @media (max-width: 768px) {
     .sidebar {
         width: 200px;
@@ -176,9 +202,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
 }
-
 #studentUpdate .container {
     width: 100%;
 }
@@ -268,9 +292,9 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6); 
-    display: flex; /* Flexbox for centering */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
     z-index: 1000;
 }
 .modal-section.success{
@@ -280,9 +304,9 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6); 
-    display: flex; /* Flexbox for centering */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
     z-index: 1000;
 }
 .modal-box {
@@ -292,12 +316,8 @@ body {
     width: 100%;
     max-width: 500px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
-    text-align: center; /* Center text inside the modal */
+    text-align: center; 
 }
-
-
-
-
 .modal-box {
     background: #fff;
     padding: 20px;
@@ -305,7 +325,6 @@ body {
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
 .modal-box h2,
 .modal-box h3 {
     margin: 10px 0;
@@ -314,7 +333,6 @@ body {
 .buttons {
     margin-top: 20px;
 }
-
 .buttons .close-btn {
     background: #007bff;
     color: #fff;
@@ -324,7 +342,6 @@ body {
     cursor: pointer;
     margin: 5px;
 }
-
 .buttons .close-btn:hover {
     background: #0056b3;
 }
@@ -374,21 +391,31 @@ body {
 #clear-btn-student-section:hover {
     color: #333;
 }
-/* Edit Button */
-.edit-btn button {
+.action-buttons {
+    display: flex;
+    gap: 10px; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.edit-btn button,
+.deletebtn button {
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
-    width: 60px;
-    height: 60px;
+    width: 30px;
+    height: 30px;
     border-radius: 12%;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.edit-btn button {
     background: linear-gradient(45deg, #3db63d, #9ae19d);
     color: #000000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
 }
 
 .edit-btn button:hover {
@@ -397,21 +424,9 @@ body {
     box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
 }
 
-/* Delete Button */
 .deletebtn button {
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    width: 60px;
-    height: 60px;
-    border-radius: 12%;
     background: linear-gradient(45deg, #f05f5f, #dc3545);
     color: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
 }
 
 .deletebtn button:hover {
@@ -420,13 +435,7 @@ body {
     box-shadow: 0 6px 12px rgba(220, 53, 69, 0.4);
 }
 
-/* Icons inside buttons */
-button i {
-    font-size: 1.5rem;
-    margin: 0; 
-}
 
-/* Modal Section */
 .modal-section {
     position: fixed;
     top: 0;
@@ -507,4 +516,163 @@ button i {
 .table-container table th {
     background-color: #f4f4f4;
     font-weight: bold;
+}
+
+.add-student-button {
+  text-align: center; 
+}
+
+.add-student-button a {
+  text-decoration: none; 
+}
+
+.add-student-button button {
+  background-color: #007BFF; 
+  color: white; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: all 0.3s ease;
+}
+
+.add-student-button button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+.add-student-button button:focus {
+  outline: 2px solid #007BFF; 
+  outline-offset: 2px; 
+}
+
+.add-student-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px; /* Adjust as needed */
+}
+
+.add-student-button a {
+  text-decoration: none; 
+}
+
+.add-student-button button {
+  display: flex;
+  align-items: center; 
+  gap: 8px; 
+  background-color: #007BFF; 
+  color: white; 
+  padding: 10px 20px; 
+  font-size: 16px; 
+  font-weight: bold; 
+  border: none; 
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: all 0.3s ease;
+}
+
+.add-student-button button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.add-student-button button:focus {
+  outline: 2px solid #007BFF; 
+  outline-offset: 2px; 
+}
+
+.add-student-button button .icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: white; 
+  color: #007BFF;
+  border-radius: 50%; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px; 
+  font-weight: bold;
+}
+
+#setting {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+    font-family: 'Arial', sans-serif;
+}
+
+#setting h2 {
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#setting p {
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+form label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+form .adminupdatebtn {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form p {
+    text-align: center;
+    font-size: 14px;
+    color: #e74c3c;
+}
+
+@media (max-width: 768px) {
+    #setting {
+        padding: 15px;
+        max-width: 100%;
+    }
+
+    form {
+        padding: 15px;
+    }
 }

@@ -7,82 +7,77 @@ if (!isset($_SESSION['admin_email'])) {
     header('Location: adminlogin.php');
     exit();
 }
-$query = "
-    SELECT student.*, 
-           logincredentials.email, 
-           approvals.status 
-    FROM student
-    LEFT JOIN logincredentials 
-    ON student.id = logincredentials.student_id
-    LEFT JOIN approvals 
-    ON student.id = approvals.student_id";
-          
-$result = mysqli_query($conn, $query);
-$result1 = mysqli_query($conn, $query);
-
-if (!$result) {
-    die("Error fetching data: " . mysqli_error($conn));
-}
- if (!empty($_FILES['profileImage']['name'])) {
-        $imageName = basename($_FILES['profileImage']['name']);
-        $imagePath = '../images-data/' . $imageName;
-
-        if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+    $query = "
+        SELECT student.*, 
+            logincredentials.email, 
+            approvals.status 
+        FROM student
+        LEFT JOIN logincredentials 
+        ON student.id = logincredentials.student_id
+        LEFT JOIN approvals 
+        ON student.id = approvals.student_id";
             
-            $imageQueryPart = ", student.image = '$imagePath'";
+    $result = mysqli_query($conn, $query);
+    $result1 = mysqli_query($conn, $query);
+
+    if (!$result) {
+        die("Error fetching data: " . mysqli_error($conn));
+    }
+    if (!empty($_FILES['profileImage']['name'])) {
+            $imageName = basename($_FILES['profileImage']['name']);
+            $imagePath = '../images-data/' . $imageName;
+
+            if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+                
+                $imageQueryPart = ", student.image = '$imagePath'";
+            } else {
+                echo "Failed to upload image.";
+                exit();
+            }
         } else {
-            echo "Failed to upload image.";
-            exit();
+            $imageQueryPart = ""; 
         }
+
+    $count_query = "SELECT COUNT(*) AS student_count FROM student";
+    $count_result = mysqli_query($conn, $count_query);
+
+    if ($count_result) {
+        $count_data = mysqli_fetch_assoc($count_result);
+        $student_count = $count_data['student_count'];
     } else {
-        $imageQueryPart = ""; 
+        $student_count = 0;
+    }
+    $count_queryPending = "SELECT COUNT(*) AS pending_count FROM approvals WHERE status = 'pending'";
+    $count_resultPending = $conn->query($count_queryPending);
+
+    $pending_count = 0; 
+    if ($count_resultPending && $count_resultPending->num_rows > 0) {
+        $row = $count_resultPending->fetch_assoc();
+        $pending_count = $row['pending_count'];
+    } else {
+        echo "Error fetching pending count: " . $conn->error;
+    }
+    $count_queryApprove = "SELECT COUNT(*) AS approved_count FROM approvals WHERE status = 'approved'";
+    $count_resultApprove = $conn->query($count_queryApprove);
+
+    $approved_count = 0;
+    if ($count_resultApprove && $count_resultApprove->num_rows > 0) {
+        $row = $count_resultApprove->fetch_assoc();
+        $approved_count = $row['approved_count'];
+    } else {
+        echo "Error fetching approved count: " . $conn->error;
     }
 
-$count_query = "SELECT COUNT(*) AS student_count FROM student";
-$count_result = mysqli_query($conn, $count_query);
-
-if ($count_result) {
-    $count_data = mysqli_fetch_assoc($count_result);
-    $student_count = $count_data['student_count'];
-} else {
-    $student_count = 0;
-}
-$count_queryPending = "SELECT COUNT(*) AS pending_count FROM approvals WHERE status = 'pending'";
-$count_resultPending = $conn->query($count_queryPending);
-
-$pending_count = 0; 
-if ($count_resultPending && $count_resultPending->num_rows > 0) {
-    $row = $count_resultPending->fetch_assoc();
-    $pending_count = $row['pending_count'];
-} else {
-  
-    echo "Error fetching pending count: " . $conn->error;
-}
-
-$count_queryApprove = "SELECT COUNT(*) AS approved_count FROM approvals WHERE status = 'approved'";
-$count_resultApprove = $conn->query($count_queryApprove);
-
-$approved_count = 0; // Default value
-if ($count_resultApprove && $count_resultApprove->num_rows > 0) {
-    $row = $count_resultApprove->fetch_assoc();
-    $approved_count = $row['approved_count'];
-} else {
-    // Output an error if the query fails
-    echo "Error fetching approved count: " . $conn->error;
-}
-
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
-    $id = $_POST['student_id'];
-    $firstname = $_POST['firstname'];
-    $middlename = $_POST['middlename'];
-    $lastname = $_POST['lastname'];
-    $age = $_POST['age'];
-    $gender = $_POST['gender'];
-    $phone = $_POST['phone'];
-    $address = $_POST['address'];
-    $imageQuery = "";
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+        $id = $_POST['student_id'];
+        $firstname = $_POST['firstname'];
+        $middlename = $_POST['middlename'];
+        $lastname = $_POST['lastname'];
+        $age = $_POST['age'];
+        $gender = $_POST['gender'];
+        $phone = $_POST['phone'];
+        $address = $_POST['address'];
+        $imageQuery = "";
 
     if (!empty($_FILES['profileImage']['name'])) {
         $imageName = basename($_FILES['profileImage']['name']);
@@ -92,7 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             $imageQuery = ", image = '$imagePath'";
         }
     }
-
     $updateQuery = "UPDATE student SET 
                     firstname = '$firstname', 
                     middlename = '$middlename', 
@@ -111,10 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     }
 }
 
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
-    $student_id = $_POST['student_id'];
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete') {
+        $student_id = $_POST['student_id'];
 
     mysqli_begin_transaction($conn);
 
@@ -133,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         mysqli_commit($conn);
 
-        $_SESSION['delete_success'] = true; // Set success flag
+        $_SESSION['delete_success'] = true;
         header("Location: admin.php");
         exit();
     } catch (Exception $e) {
@@ -142,25 +134,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Check for delete success and pass data to modal
-$showSuccessModal = false;
-if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) {
-    $showSuccessModal = true;
-    unset($_SESSION['delete_success']); // Clear session variable
-}   
+    $showSuccessModal = false;
+    if (isset($_SESSION['delete_success']) && $_SESSION['delete_success'] === true) {
+        $showSuccessModal = true;
+        unset($_SESSION['delete_success']);
+    }   
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
-    $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
-    $middlename = mysqli_real_escape_string($conn, $_POST['middlename']);
-    $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
-    $age = mysqli_real_escape_string($conn, $_POST['age']);
-    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
-    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-    $address = mysqli_real_escape_string($conn, $_POST['address']);
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $password = mysqli_real_escape_string($conn, $_POST['password']);
-    $imagePath = '';
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
+        $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
+        $middlename = mysqli_real_escape_string($conn, $_POST['middlename']);
+        $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
+        $age = mysqli_real_escape_string($conn, $_POST['age']);
+        $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+        $address = mysqli_real_escape_string($conn, $_POST['address']);
+        $email = mysqli_real_escape_string($conn, $_POST['email']);
+        $password = mysqli_real_escape_string($conn, $_POST['password']);
+        $imagePath = '';
 
     if (!empty($_FILES['profileImage']['name'])) {
         $imageName = basename($_FILES['profileImage']['name']);
@@ -171,7 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
             exit();
         }
     }
-
     $insertStudentQuery = "INSERT INTO student (firstname, middlename, lastname, age, gender, phone, address, image)
                            VALUES ('$firstname', '$middlename', '$lastname', '$age', '$gender', '$phone', '$address', '$imagePath')";
 
@@ -191,6 +181,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
         echo "Error inserting student: " . mysqli_error($conn);
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -207,229 +199,259 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
 <body>
     <div class="container">
         <aside class="sidebar">
-            <h2>Admin Panel</h2>
+            <div class="admin-panel-header">
+                <img src="../images/bsitlogo.png" alt="Admin Icon" class="admin-icon">
+            </div>
+            <h2>BSIT Admin Panel</h2>
             <ul>
-                <li><a href="javascript:void(0);" data-section="dashboard" onclick="showSection('dashboard')">Dashboard</a></li>
-                <li><a href="javascript:void(0);" data-section="dashboard" onclick="showSection('notification')">Notification</a></li>
-                <li><a href="javascript:void(0);" data-section="student" onclick="showSection('student')">Students</a></li>
-                <li><a href="javascript:void(0);" data-section="setting" onclick="showSection('setting')">Settings</a></li>
-                <li><a href="adminlogout.php">Logout</a></li>
+                <li><a href="javascript:void(0);" data-section="dashboard" onclick="showSection('dashboard')"><i class="fa-solid fa-house"></i>Dashboard</a></li>
+                <li><a href="javascript:void(0);" data-section="notification" onclick="showSection('notification')"><i class="fa-solid fa-envelope"></i>Notification</a></li>
+                <li><a href="javascript:void(0);" data-section="student" onclick="showSection('student')"><i class="fa-solid fa-user"></i>Students</a></li>
+                <li><a href="javascript:void(0);" data-section="setting" onclick="showSection('setting')"><i class="fa-solid fa-gear"></i>Settings</a></li>
+                <li><a href="adminlogout.php"><i class="fa-solid fa-right-from-bracket"></i>Logout</a></li>
             </ul>
         </aside>
 
         <main class="main-content">
-       
             <div id="dashboard" class="section-content">
-                <h2>Dashboard</h2>
-                  <div class="cards">
-           <div class="card">
-            <h3><?php echo $student_count; ?></h3>
-            <p>Student</p>
-        </div>
-
-            <div class="card">
-            <h3><?php echo $pending_count; ?></h3>
-            <p>Pending Approval</p>
-        </div>
-
-            <div class="card">
-               <h3><?php echo $approved_count; ?></h3>
-                <p>Enrolled</p>
+                    <h2>Dashboard</h2>
+                        <div class="cards">
+                            <div class="card">
+                                <h3><?php echo $student_count; ?></h3>
+                                <p>Student</p>
+                            </div>
+                            <div class="card">
+                                <h3><?php echo $pending_count; ?></h3>
+                                <p>Pending Approval</p>
+                            </div>
+                            <div class="card">
+                                <h3><?php echo $approved_count; ?></h3>
+                                <p>Enrolled</p>
+                            </div>
+                        </div>
+            <div class="tables">
+                <div class="table-container">
+                        <center>
+                            <h2>Student List</h2>
+                        </center>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body" >
+                            <?php
+                                $sql = "SELECT * FROM student";
+                                    $query = mysqli_query($conn,$sql);
+                                if ($result && mysqli_num_rows($result) > 0) {
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo "<tr>";
+                                        echo "<td>" . htmlspecialchars($row['id']) . "</td>";
+                                        echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
+                                        echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+                                        echo "<td>" . htmlspecialchars($row['status'] ?? 'No Status') . "</td>"; // Show status or "No Status"
+                                        echo "</tr>";
+                                    }
+                                } else {
+                                    echo "<tr><td colspan='6' class='text-center'>No students found</td></tr>";
+                                }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="tables">
+    <div id="notification" class="section-content" style="display: none;">
+            <h2>Approval Requests</h2>
             <div class="table-container">
-                <center>
-                    <h2>Student List</h2>
-                </center>
-    <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Status</th>
-               
-            </tr>
-        </thead>
-        <tbody id="student-table-body" >
-            <?php
-            $sql = "SELECT * FROM student";
-                $query = mysqli_query($conn,$sql);
-            if ($result && mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<tr>";
-                    echo "<td>" . htmlspecialchars($row['id']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
-                     echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['status'] ?? 'No Status') . "</td>"; // Show status or "No Status"
-                    echo "</tr>";
-                }
-            } else {
-                echo "<tr><td colspan='6' class='text-center'>No students found</td></tr>";
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
-
-        </div>
-            </div>
-              <div id="notification" class="section-content" style="display: none;">
-    <h2>Approval Requests</h2>
-    <div class="table-container">
-        <h5>Recent Approval Requests</h5>
-        <table>
-            <thead>
-                <tr>
-                    <th>Student ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Request Date</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-    <?php
-    $approvalQuery = "
-        SELECT approvals.id AS approval_id, approvals.status, approvals.created_at, 
-            student.firstname, student.middlename, student.lastname, student.id AS student_id, 
-            logincredentials.email 
-        FROM approvals 
-        JOIN student ON approvals.student_id = student.id 
-        JOIN logincredentials ON student.id = logincredentials.student_id
-        ORDER BY approvals.created_at DESC";
-    $approvalResult = mysqli_query($conn, $approvalQuery);
-
-    if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
-        while ($row = mysqli_fetch_assoc($approvalResult)) {
-            echo "<tr>";
-            echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['email']) . "</td>";
-            echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
-            echo "<td>" . ucfirst(htmlspecialchars($row['status'])) . "</td>";
-            echo "<td>";
-            if (strtolower($row['status']) === 'pending') {
-                echo "<form method='POST' action='handleApproval.php' enctype='multipart/form-data' style='display:inline-block;'>
-                        <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
-                        <input type='file' name='approval_picture' accept='image/*' required>
-                        <button type='submit' name='action' value='approve'>Approve</button>
-                    </form>
-                    <form method='POST' action='handleApproval.php' style='display:inline-block;'>
-                        <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
-                        <button type='submit' name='action' value='reject'>Reject</button>
-                    </form>";
-            } elseif (strtolower($row['status']) === 'approved') {
-                echo '<span style="color: green; font-weight: bold;"><i class="fa-solid fa-check"></i></span>';
-            } elseif (strtolower($row['status']) === 'rejected') {
-                 echo '<span style="color: red; font-weight: bold;"><i class="fa-solid fa-xmark"></i></span>';
-            }
-
-            echo "</td>";
-            echo "</tr>";
-        }
-    } else {
-        echo "<tr><td colspan='6' class='text-center'>No approval requests found</td></tr>";
-    }
-    ?>
-
-
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
-            <div id="student" class="section-content" style="display: none;">
-                <h2>Student List</h2>
-                <p>Manage Your students</p>
-        <table>
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Student Profile</th>
-                <th>Name</th>
-                <th>Age</th>
-                <th>Gender</th>
-                <th>Contact</th>
-                <th>Address</th>
-                <th>Email</th>
-                <th>Edit</th>
-            </tr>
-        </thead>
-         <tbody id="student-table-body-student-section">
-            <div class="add-student-button">
-                <a href="adminaddStudent.php">
-                    <button>Add New Student</button>
-                </a>
-            </div>
-
-            <div class="search-container">
-                <input type="text" id="search-input-student-section" placeholder="Search students">
-                <button id="clear-btn-student-section" style="display: none;">✖</button>
-                <button id="search-btn-student-section"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-            </div>
-            
-                    <?php while ($row = mysqli_fetch_assoc($result1)) { ?>
+                <h5>Recent Approval Requests</h5>
+                <table>
+                    <thead>
                         <tr>
-                            <td><?php echo $row['id']; ?></td>
-                          <td>
-                                <?php if (!empty($row['image'])) { ?>
-                            <img src="<?php $imagePath = '../images-data/' . $row['image'];echo file_exists($imagePath) ? htmlspecialchars($imagePath) : '../' . htmlspecialchars($row['image']); ?>" class="profile-image" id="profileDisplay" alt="Profile" style="width:120px; height:120px;">                                     
-                                <?php } ?>
-                            </td>
-                            <td><?php echo $row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']; ?></td>
-                            <td><?php echo $row['age']; ?></td>
-                            <td><?php echo $row['gender']; ?></td>
-                            <td><?php echo $row['phone']; ?></td>
-                            <td><?php echo $row['address']; ?></td>
-                            <td><?php echo $row['email']; ?></td>
-                            <td>
-                           
-                            <form method="POST" action="adminUpdateStudent.php">
-                                    <a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
-                                    <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
-                                        <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
-                                        </a>
-                                </form>
-                                <a href="#modal-section" class="deletebtn">
-                                <form method="POST" action="admin.php" onsubmit="return confirmDelete(event);">
-                                    <input  type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
-                                    <input type="hidden" name="action" value="delete">
-                                    <button  type="submit">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            </a>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            <?php
+                            $approvalQuery = "
+                                SELECT approvals.id AS approval_id, approvals.status, approvals.created_at, 
+                                    student.firstname, student.middlename, student.lastname, student.id AS student_id, 
+                                    logincredentials.email 
+                                FROM approvals 
+                                JOIN student ON approvals.student_id = student.id 
+                                JOIN logincredentials ON student.id = logincredentials.student_id
+                                ORDER BY approvals.created_at DESC";
+                            $approvalResult = mysqli_query($conn, $approvalQuery);
 
+                            if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+                                while ($row = mysqli_fetch_assoc($approvalResult)) {
+                                    echo "<tr>";
+                                    echo "<td>" . htmlspecialchars($row['student_id']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['email']) . "</td>";
+                                    echo "<td>" . htmlspecialchars($row['created_at']) . "</td>";
+                                    echo "<td>" . ucfirst(htmlspecialchars($row['status'])) . "</td>";
+                                    echo "<td>";
+                                    if (strtolower($row['status']) === 'pending') {
+                                        echo "<form method='POST' action='handleApproval.php' enctype='multipart/form-data' style='display:inline-block;'>
+                                                <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
+                                                <input type='file' name='approval_picture' accept='image/*' required>
+                                                <button type='submit' name='action' value='approve'>Approve</button>
+                                            </form>
+                                            <form method='POST' action='handleApproval.php' style='display:inline-block;'>
+                                                <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
+                                                <button type='submit' name='action' value='reject'>Reject</button>
+                                            </form>";
+                                    } elseif (strtolower($row['status']) === 'approved') {
+                                        echo '<span style="color: green; font-weight: bold;"><i class="fa-solid fa-check"></i></span>';
+                                    } elseif (strtolower($row['status']) === 'rejected') {
+                                        echo '<span style="color: red; font-weight: bold;"><i class="fa-solid fa-xmark"></i></span>';
+                                    }
+
+                                    echo "</td>";
+                                    echo "</tr>";
+                                }
+                            } else {
+                                echo "<tr><td colspan='6' class='text-center'>No approval requests found</td></tr>";
+                            }
+                            ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+        <div id="student" class="section-content" style="display: none;">
+            <h2>Student List</h2>
+                <p>Manage Your students</p>
+                <table>
+                <thead>
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Student Profile</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Contact</th>
+                        <th>Address</th>
+                        <th>Email</th>
+                        <th>Edit</th>
+                    </tr>
+                </thead>
+                <tbody id="student-table-body-student-section">
+                    <div class="add-student-button">
+                        <a href="adminaddStudent.php">
+                            <button><i class="fa-solid fa-circle-plus"></i>Add New Student</button>
+                        </a>
+                    </div>
+
+                    <div class="search-container">
+                        <input type="text" id="search-input-student-section" placeholder="Search students">
+                        <button id="clear-btn-student-section" style="display: none;">✖</button>
+                        <button id="search-btn-student-section"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+                    </div>
+                    
+                            <?php while ($row = mysqli_fetch_assoc($result1)) { ?>
+                                <tr>
+                                    <td><?php echo $row['id']; ?></td>
+                                <td>
+                                        <?php if (!empty($row['image'])) { ?>
+                                    <img src="<?php $imagePath = '../images-data/' . $row['image'];echo file_exists($imagePath) ? htmlspecialchars($imagePath) : '../' . htmlspecialchars($row['image']); ?>" class="profile-image" id="profileDisplay" alt="Profile" style="width:120px; height:120px;">                                     
+                                        <?php } ?>
+                                    </td>
+                                    <td><?php echo $row['firstname'] . ' ' . $row['middlename'] . ' ' . $row['lastname']; ?></td>
+                                    <td><?php echo $row['age']; ?></td>
+                                    <td><?php echo $row['gender']; ?></td>
+                                    <td><?php echo $row['phone']; ?></td>
+                                    <td><?php echo $row['address']; ?></td>
+                                    <td><?php echo $row['email']; ?></td>
+                                    <td>
+                                     <div class="action-buttons">
+                                   <form method="POST" action="adminUpdateStudent.php">
+                                            <a href="adminUpdateStudent.php?id=<?php echo $row['id']; ?>" class="edit-btn">
+                                            <input type="hidden" name="student_id" value="<?php echo htmlspecialchars($row['id']); ?>">
+                                                <button type="button" onclick="openModal(<?php echo htmlspecialchars(json_encode($row)); ?>)">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </button>
+                                                </a>
+                                        </form>
+                                    <form class="deletebtn" method="POST" action="admin.php" onsubmit="return confirmDelete(event);">
+                                        <input type="hidden" name="student_id" value="<?php echo $row['id']; ?>">
+                                        <input type="hidden" name="action" value="delete">
+                                        <button type="submit" class="deletebtn">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     <?php } ?>
                 </tbody>
-    </table>
-   
+            </table>
+                    </div>
+                 <div id="setting" class="section-content" style="display: none;">
+            <h2>Settings Content</h2>
+            <p>This is the content for managing admin.</p>
+                <?php 
+                                
+                $admin_id = 1; 
+                    $query = "SELECT * FROM admin WHERE id = ?";
+                    $stmt = $conn->prepare($query);
+                    $stmt->bind_param('i', $admin_id);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    $admin = $result->fetch_assoc();
+                    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                        $adminname = $_POST['adminname'];
+                        $admin_email = $_POST['admin_email'];
+                        $admin_password = $_POST['admin_password'];
 
-            </div>
+                        $update_query = "UPDATE admin SET adminname = ?, admin_email = ?, admin_password = ? WHERE id = ?";
+                        $update_stmt = $conn->prepare($update_query);
+                        $update_stmt->bind_param('sssi', $adminname, $admin_email, $admin_password, $admin_id);
 
-            <div id="setting" class="section-content" style="display: none;">
-                <h2>Settings Content</h2>
-                <p>This is the content for managing settings.</p>
-            </div>
+                        if ($update_stmt->execute()) {
+                            echo "<p>Admin details updated successfully!</p>";
+                        } else {
+                            echo "<p>Error updating admin details.</p>";
+                        }
+                    }
+                ?>                            
+            <form method="post">
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['adminname']); ?>" required>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['admin_email']); ?>" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($admin['admin_password']); ?>" required>
+                </div>
+                <button type="submit" class="adminupdatebtn" >Update Admin</button>
+            </form>
+        </div>
 
-        </main>
+    </main>
     </div>
 
     <section id="modal-section add-student" class="modal-section" style="display: none;">
-    <span class="overlay" onclick="closeModal();"></span>
-    <div class="modal-box">
-      <div id="add-student" class="section-content" style="display: none;">
-    <h2>Add New Student</h2>
-    <form action="admin.php" method="POST" enctype="multipart/form-data">
-        <label for="firstname">First Name:</label>
+        <span class="overlay" onclick="closeModal();"></span>
+        <div class="modal-box">
+        <div id="add-student" class="section-content" style="display: none;">
+        <h2>Add New Student</h2>
+        <form action="admin.php" method="POST" enctype="multipart/form-data">
+            <label for="firstname">First Name:</label>
         <input type="text" id="firstname" name="firstname" required>
         
         <label for="middlename">Middle Name:</label>

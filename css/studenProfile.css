@@ -271,7 +271,6 @@ header {
     background-color: #0056b3;
 }
 
-/* Info section */
 .info {
     display: flex;
     justify-content: space-between;
@@ -297,15 +296,12 @@ header {
     border-radius: 5px;
     font-size: 14px;
 }
-
-/* Divider */
 .divider {
     width: 1px;
     background-color: #ddd;
     margin: 0 10px;
 }
 
-/* Input group */
 .input-group {
     margin-bottom: 20px;
 }
@@ -324,8 +320,6 @@ header {
     border-radius: 5px;
     font-size: 14px;
 }
-
-/* Save button */
 .save-btn {
     background-color: #28a745;
     color: #fff;
@@ -337,12 +331,10 @@ header {
     transition: background-color 0.3s ease;
     width: 100%;
 }
-
 .save-btn:hover {
     background-color: #218838;
 }
 
-/* Animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -354,7 +346,6 @@ header {
     }
 }
 
-/* Responsive */
 @media (max-width: 480px) {
     .profile-card {
         width: 90%;
@@ -377,9 +368,9 @@ header {
         width: 100%;
     }
 }
-/* Modal Styling */
+
 .modal-overlay {
-    display: none; /* Initially hidden */
+    display: none; 
     position: fixed;
     top: 0;
     left: 0;
@@ -392,7 +383,7 @@ header {
 }
 
 .modal-overlay.active {
-    display: flex; /* Show modal when active */
+    display: flex; 
 }
 
 .modal-content {
@@ -426,4 +417,61 @@ header {
 .image-container p {
     font-size: 18px;
     color: #333;
+}
+
+.view-btn {
+  background-color: #4CAF50; 
+  color: white; 
+  padding: 12px 20px; 
+  font-size: 16px; 
+  border: none;
+  border-radius: 5px; 
+  cursor: pointer; 
+  transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+  background-color: #45a049; 
+  transform: scale(1.05); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.view-btn:focus {
+  outline: 2px solid #4CAF50; 
+  outline-offset: 2px; 
+}
+footer {
+    background-color: #1D212B;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    bottom: 0;
+    width: auto;
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+}
+
+footer .footer-links a {
+    color: #2696E9;
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 14px;
+}
+
+footer .footer-links a:hover {
+    text-decoration: underline;
+}
+
+
+@media (max-width: 768px) {
+    footer p {
+        font-size: 12px;
+    }
+    footer .footer-links a {
+        font-size: 12px;
+    }
 }
