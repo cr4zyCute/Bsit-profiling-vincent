@@ -65,6 +65,7 @@ if (!empty($_SESSION['student_id'])) {
             echo "Error updating profile: " . mysqli_error($conn);
         }
     }
+    
     $approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
     $approvalResult = mysqli_query($conn, $approvalQuery);
 
@@ -103,7 +104,7 @@ if (!empty($_SESSION['student_id'])) {
 <body>
     <header>
         <div class="top-buttons">
-            <button onclick="openImageModal()" class="view-btn">View Image</button>
+            <button onclick="openImageModal()" class="view-btn">Schedule</button>
                 <div>
                     <!-- <form action="./admin/sendApproval.php" method="POST">
                         <button class="email-btn"type="submit" name="sendApproval" >Send Approval<i class="fa-regular fa-paper-plane"></i></button>
@@ -113,7 +114,7 @@ if (!empty($_SESSION['student_id'])) {
                             if ($approvalStatus === 'pending') {
                                 echo "<button disabled>Waiting for Approval</button>";
                             } elseif ($approvalStatus === 'approved') {
-                                echo "<p>Your request has been approved.</p>";
+                                echo "<p id='approved' >Your request has been approved.</p>";
                             } else {
                                 echo "
                                 <form action='./admin/sendApproval.php' method='POST'>
@@ -149,10 +150,10 @@ if (!empty($_SESSION['student_id'])) {
                                 $webPath = str_replace('../', '', $approvalPicture);
                                 echo '<img src="' . htmlspecialchars($webPath) . '?v=' . time() . '" style="width:650px; height:600px;" alt="Admin Sent Image">';
                             } else {
-                                echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
+                                echo '<p>No Schedule yet! Please Wait For your Approval</p>';
                             }
                         } else {
-                            echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
+                             echo '<p>No Schedule yet! Please Wait For your Approval</p>';
                         }
                     ?>
                 </div>
@@ -203,7 +204,7 @@ if (!empty($_SESSION['student_id'])) {
                                 }
                             ?>                    
                             <input type="file" id="profileImageUpload" name="profileImage" accept="image/*" onchange="previewImage(event)" hidden>
-                        <div class="edit-btn" onclick="document.getElementById('profileImageUpload').click()">Edit</div>
+                        <div class="edit-btn" onclick="document.getElementById('profileImageUpload').click()"><i class="fa-solid fa-pen"></i></div>
                     </div>
                 
                 <div class="info">
@@ -233,8 +234,17 @@ if (!empty($_SESSION['student_id'])) {
                 <div class="input-group">
                     <label for="email">Email:</label>
                     <input type="text" id="email" name="email" value="<?php echo htmlspecialchars($student['email']); ?>">
+
+                      <div>
                     <label for="password">Password:</label>
-                    <input type="text" id="password" name="password" value="<?php echo htmlspecialchars($student['password']); ?>">
+                    <div style="position: relative; display: inline-block;">
+                        <input type="password" id="password" name="password" 
+                            value="<?php echo htmlspecialchars($student['password']); ?>" required 
+                            style="padding-right: 30px;">
+                        <i class="fa-solid fa-eye-slash" id="togglePassword" 
+                            style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                    </div>
+                </div>
                 </div>
 
                 <button type="submit" class="save-btn">Save Changes</button>
@@ -253,6 +263,24 @@ if (!empty($_SESSION['student_id'])) {
 
     <script src="js/editprofile.js"></script>
     <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+            const errorMessage = document.getElementById('approved');
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 5000); 
+            }
+        });
+
+    const passwordInput = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('togglePassword');
+    togglePasswordIcon.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        togglePasswordIcon.classList.toggle('fa-eye');
+        togglePasswordIcon.classList.toggle('fa-eye-slash');
+    });
 
         function openImageModal() {
             document.getElementById('viewImageModal').classList.add('active');

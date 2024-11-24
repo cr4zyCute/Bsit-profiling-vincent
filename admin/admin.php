@@ -427,7 +427,7 @@ if (!isset($_SESSION['admin_email'])) {
                 ?>                            
             <form method="post">
                 <div>
-                    <label for="username">Username:</label>
+                    <label for="username">Admin Name:</label>
                     <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['adminname']); ?>" required>
                 </div>
                 <div>
@@ -436,7 +436,13 @@ if (!isset($_SESSION['admin_email'])) {
                 </div>
                 <div>
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($admin['admin_password']); ?>" required>
+                    <div style="position: relative; display: inline-block;">
+                        <input type="password" id="password" name="password" 
+                            value="<?php echo htmlspecialchars($admin['admin_password']); ?>" required 
+                            style="padding-right: 30px;">
+                        <i class="fa-solid fa-eye-slash" id="togglePassword" 
+                            style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+                    </div>
                 </div>
                 <button type="submit" class="adminupdatebtn" >Update Admin</button>
             </form>
@@ -445,51 +451,6 @@ if (!isset($_SESSION['admin_email'])) {
     </main>
     </div>
 
-    <section id="modal-section add-student" class="modal-section" style="display: none;">
-        <span class="overlay" onclick="closeModal();"></span>
-        <div class="modal-box">
-        <div id="add-student" class="section-content" style="display: none;">
-        <h2>Add New Student</h2>
-        <form action="admin.php" method="POST" enctype="multipart/form-data">
-            <label for="firstname">First Name:</label>
-        <input type="text" id="firstname" name="firstname" required>
-        
-        <label for="middlename">Middle Name:</label>
-        <input type="text" id="middlename" name="middlename">
-        
-        <label for="lastname">Last Name:</label>
-        <input type="text" id="lastname" name="lastname" required>
-        
-        <label for="age">Age:</label>
-        <input type="number" id="age" name="age" required>
-        
-        <label for="gender">Gender:</label>
-        <select id="gender" name="gender" required>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-        </select>
-        
-        <label for="phone">Phone:</label>
-        <input type="text" id="phone" name="phone" required>
-        
-        <label for="address">Address:</label>
-        <textarea id="address" name="address" required></textarea>
-        
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        
-        <label for="profileImage">Profile Image:</label>
-        <input type="file" id="profileImage" name="profileImage">
-        
-        <button type="submit" name="add-student">Add Student</button>
-    </form>
-</div>
-    </div>
-</section>
 
 <section id="modal-section" class="modal-section" style="display: none;">
     <span class="overlay" onclick="closeModal();"></span>
@@ -520,6 +481,16 @@ if (!isset($_SESSION['admin_email'])) {
 
     
     <script>
+
+        const passwordInput = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('togglePassword');
+
+    togglePasswordIcon.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        togglePasswordIcon.classList.toggle('fa-eye');
+        togglePasswordIcon.classList.toggle('fa-eye-slash');
+    });
 
         function showSection(section) {
     const sections = document.querySelectorAll(".section-content");
