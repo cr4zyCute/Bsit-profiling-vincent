@@ -2,14 +2,12 @@
 session_start();
 include 'database/db.php';
 
-$error_message = ""; // Initialize error message to empty
+$error_message = ""; 
 
-// Check if the form was submitted via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
 
-    // Check if the user exists
     $email_check_sql = "SELECT * FROM loginCredentials WHERE email = '$email'";
     $email_check_result = mysqli_query($conn, $email_check_sql);
 
@@ -17,13 +15,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         $error_message = "User does not exist!";
     } else {
         $user = mysqli_fetch_assoc($email_check_result);
-
-        // Check for correct password
         if ($user['password'] === $password) {
             $_SESSION['student_id'] = $user['student_id'];
             $_SESSION['email'] = $user['email'];
 
-            // Redirect to the student dashboard or desired page
             header('Location: student.php');
             exit();
         } else {
@@ -67,14 +62,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
 <section id="home">
     <img src="./images/IMG_3564.jpg" alt="">
-<section id="formContainer" class="<?= !empty(trim($error_message)) ? 'show' : '' ?>">
+<section id="formContainer" class="<?= $_SERVER['REQUEST_METHOD'] === 'POST' ? 'show' : '' ?>">
     <div class="form_container">
         <i class="uil uil-times form_close" onclick="toggleLoginForm()"></i>
         <div class="form login_form">
             <form action="" method="post">
                 <h2>Login</h2>
                 <?php if (!empty($error_message)) : ?>
-                    <p style="color: red;"><?= $error_message; ?></p>
+                    <p id="errorMessage" style="color: red;"><?= $error_message; ?></p>
                 <?php endif; ?>
                 <div class="input_box">
                     <input type="email" name="email" placeholder="Enter your email" required>
@@ -181,7 +176,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         </div>
     </footer>
 <script src="./js/index.js" ></script>
-<script type="text/javascript">
+<script >
+    function toggleLoginForm() {
+    const formContainer = document.getElementById('formContainer');
+    formContainer.classList.toggle('show');
+}
+
     window.addEventListener('scroll', reveal);
 function reveal(){
     var reveals = document.querySelectorAll('.reveal')
@@ -198,6 +198,15 @@ function reveal(){
         }
     }
 }
+
+    document.addEventListener('DOMContentLoaded', () => {
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 3000); 
+            }
+        });
 </script>
 </body>
 </html>

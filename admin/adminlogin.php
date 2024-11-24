@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         $error_message = "User does not exist!";
     } else {
         $user = mysqli_fetch_assoc($email_check_result);
-
         if ($user['admin_password'] === $password) {
             $_SESSION['admin_email'] = $user['admin_email'];
             header('Location: admin.php');
