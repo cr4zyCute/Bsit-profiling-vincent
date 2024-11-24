@@ -154,28 +154,31 @@ if ($statusResult && mysqli_num_rows($statusResult) > 0) {
     <div class="modal-overlay" id="viewImageModal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeImageModal()">X</span>
-
 <div class="image-container">
     <?php
     $approvalQuery = "SELECT picture FROM approvals WHERE student_id = '$student_id' ORDER BY created_at DESC LIMIT 1";
-$approvalResult = mysqli_query($conn, $approvalQuery);
+    $approvalResult = mysqli_query($conn, $approvalQuery);
 
-$approvalPicture = null;
-if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
-    $approvalData = mysqli_fetch_assoc($approvalResult);
-    $approvalPicture = $approvalData['picture']; 
-}
-
-   $adminImagePath = '../admin/uploads/approval_pictures/' . htmlspecialchars($approvalPicture);
-
-    if (!empty($approvalPicture) && file_exists($adminImagePath)) {
-        echo '<img src="' . $adminImagePath . '?v=' . time() . '" style="width:120px; height:120px;" alt="Admin Sent Image">';
+    if ($approvalResult && mysqli_num_rows($approvalResult) > 0) {
+        $approvalData = mysqli_fetch_assoc($approvalResult);
+        $approvalPicture = $approvalData['picture']; // Path from the database
+        
+        // Debugging information
+        echo '<p>Debug: Image Path (Database): ' . htmlspecialchars($approvalPicture) . '</p>';
+        echo '<p>File exists? ' . (file_exists($approvalPicture) ? 'Yes' : 'No') . '</p>';
+   
+        if (!empty($approvalPicture) && file_exists($approvalPicture)) {
+  
+            $webPath = str_replace('../', '', $approvalPicture);
+            echo '<img src="' . htmlspecialchars($webPath) . '?v=' . time() . '" style="width:120px; height:120px;" alt="Admin Sent Image">';
+        } else {
+            echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
+        }
     } else {
-        echo 'Admin Still not Sending something! Please Wait For your Approval';
+        echo '<p>Admin Still not Sending something! Please Wait For your Approval</p>';
     }
     ?>
 </div>
-
 
 
 

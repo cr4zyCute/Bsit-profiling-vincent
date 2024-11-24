@@ -322,9 +322,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add-student'])) {
                         <button type='submit' name='action' value='reject'>Reject</button>
                     </form>";
             } elseif (strtolower($row['status']) === 'approved') {
-                echo "<span style='color: green; font-weight: bold;'>Approved</span>";
+                echo '<span style="color: green; font-weight: bold;"><i class="fa-solid fa-check"></i></span>';
             } elseif (strtolower($row['status']) === 'rejected') {
-                echo "<span style='color: red; font-weight: bold;'>Rejected</span>";
+                 echo '<span style="color: red; font-weight: bold;"><i class="fa-solid fa-xmark"></i></span>';
             }
 
             echo "</td>";

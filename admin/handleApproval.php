@@ -1,5 +1,4 @@
 <?php
-// Include your database connection file
 include_once '../database/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -7,35 +6,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'];
 
     if ($action === 'approve' && isset($_FILES['approval_picture'])) {
-        $uploadDir = 'uploads/approval_pictures/';
-        $uploadFile = $uploadDir . basename($_FILES['approval_picture']['name']);
+        $uploadDir = __DIR__ . '/../uploads/approval_pictures/';
+        $webPath = 'uploads/approval_pictures/';
 
         // Ensure the upload directory exists
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        // Move the uploaded file to the desired location
-        if (move_uploaded_file($_FILES['approval_picture']['tmp_name'], $uploadFile)) {
-            // Update the database with the approval and the picture path
+        $fileExtension = strtolower(pathinfo($_FILES['approval_picture']['name'], PATHINFO_EXTENSION));
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            die("Invalid file type. Only JPG, PNG, and GIF are allowed.");
+        }
+
+        // Generate a unique file name
+        $fileName = uniqid() . '.' . $fileExtension;
+        $uploadPath = $uploadDir . $fileName;
+        $dbFilePath = $webPath . $fileName;
+
+        // Move uploaded file
+        if (move_uploaded_file($_FILES['approval_picture']['tmp_name'], $uploadPath)) {
             $stmt = $conn->prepare("
                 UPDATE approvals 
                 SET status = 'approved', picture = ? 
                 WHERE id = ?
             ");
-            $stmt->bind_param('si', $uploadFile, $approvalId);
+            $stmt->bind_param('si', $dbFilePath, $approvalId);
 
             if ($stmt->execute()) {
                 echo "Approval processed successfully with picture.";
             } else {
-                echo "Failed to update approval: " . $stmt->error;
+                echo "Failed to update approval in database: " . $stmt->error;
             }
             $stmt->close();
         } else {
-            echo "Failed to upload picture.";
+            echo "Failed to move uploaded file. Check directory permissions.";
         }
     } elseif ($action === 'reject') {
-        // Handle rejection case
         $stmt = $conn->prepare("
             UPDATE approvals 
             SET status = 'rejected' 
