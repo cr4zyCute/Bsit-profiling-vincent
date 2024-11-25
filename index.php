@@ -26,9 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
     }
 }
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -47,14 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <nav class="navbar">
         <span class="hamburger-btn material-symbols-rounded">menu</span>
         <a href="#" class="logo">
-            <img src="images/logo.jpg" alt="logo">
+            <img src="images/bsitlogo.png" alt="logo">
             <h2>BSIT</h2>
         </a>
         <ul class="links">
             <span class="close-btn material-symbols-rounded">close</span>
             <li><a href="#home">Home</a></li>
             <li><a href="#about">About us</a></li>
-            <li><a href="#">Contact us</a></li>
+            <li><a href="https://www.facebook.com/bsitcebutech" target="_blank">Contact us</a></li>
         </ul>
         <button class="login-btn" onclick="toggleLoginForm()">LOG IN</button>
     </nav>
@@ -82,7 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 <div class="option_field">
                     <span class="checkbox">
                         <input type="checkbox" id="check">
-                        <label for="check">Remember me</label>
                     </span>
                 </div>
                 <button type="submit" name="login" class="button">Login Now</button>
@@ -95,78 +91,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         </div>
     </div>
 </section>
-
 </section>
 
-    <section>
-        <div id="about" class="container reveal">
-            <h1>BSIT</h1>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
+<section id="about">
+    <div class="intro-text">
+        <h2>Explore BSIT Programs</h2>
+        <p>
+            Discover the wide-ranging opportunities offered by our Bachelor of Science in Information Technology program. Whether you’re passionate about innovation, technology, or academic excellence, our BSIT program equips you with the tools for success in the ever-evolving IT industry.
+        </p>
+    </div>
+    
+    <div class="container reveal">
+        <div class="cards">
+            <div class="text-card">
+                <img src="images/bsit_image_2.jpg" alt="Description of Image" class="card-image">
+                <h3>BSIT</h3>
+                <p>Showcasing the Bachelor of Science in Information Technology (BSIT) program at Cebu Technological University – Nation Wide Campus. Dive into a world of innovation, technology, and opportunities that prepare you for a future-driven career in IT.</p>
             </div>
         </div>
-    </section>
-    <section>
-        <div class="container reveal">
-            <h1>BSIT</h1>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
+        <div class="cards">
+            <div class="text-card">
+                <img src="images/bsit_image_1.jpg" alt="Description of Image" class="card-image">
+                <h3>BSIT</h3>
+                <p>Celebrate academic excellence with the Bachelor of Science in Information Technology program at Cebu Technological University – Consolacion Campus. Whether you're gearing up for the future or proudly donning your graduation attire, this program paves the way for success in the dynamic IT field.</p>
             </div>
         </div>
-    </section>
-    <section>
-        <div class="container reveal">
-            <h1>BSIT</h1>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-            <div class="cards">
-                <div class="text-card">
-                    <h3>BSIT</h3>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Deserunt </p>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
+</section>
 
  
     <footer>
