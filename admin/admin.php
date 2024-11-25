@@ -398,8 +398,8 @@ if (!isset($_SESSION['admin_email'])) {
             </table>
                     </div>
                  <div id="setting" class="section-content" style="display: none;">
-            <h2>Settings Content</h2>
-            <p>This is the content for managing admin.</p>
+            <h2>Settings</h2>
+            <p>admin setting page</p>
                 <?php 
                                 
                 $admin_id = 1; 

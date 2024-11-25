@@ -32,18 +32,16 @@ if (!empty($_SESSION['student_id'])) {
         $address = mysqli_real_escape_string($conn, $_POST['address']);
         $email = mysqli_real_escape_string($conn, $_POST['email']);
         $imageQueryPart = ""; 
-        if (!empty($_FILES['profileImage']['name'])) {
-            $imageName = basename($_FILES['profileImage']['name']);
-            $imagePath = 'images-data/' . $imageName;
+       $imageName = basename($_FILES['profileImage']['name']);
+$imagePath = 'images-data/' . $imageName;
 
-       if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
-    $imageQueryPart = ", student.image = '$imagePath'";
-    } else {
-        echo "Failed to upload image.";
-        var_dump($_FILES); 
-        exit();
-    }
-    }
+if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+    $imageQueryPart = ", student.image = '$imageName'";
+} else {
+    echo "Failed to upload image.";
+    exit();
+}
+
     $updateQuery = "
         UPDATE student 
         JOIN loginCredentials ON student.id = loginCredentials.student_id

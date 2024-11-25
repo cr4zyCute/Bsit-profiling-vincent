@@ -5,7 +5,14 @@ $student = null;
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $query = "SELECT * FROM student WHERE id = $id";
+    $query = "
+        SELECT 
+            student.*, 
+            loginCredentials.email, 
+            loginCredentials.password 
+        FROM student 
+        JOIN loginCredentials ON student.id = loginCredentials.student_id 
+        WHERE student.id = $id";
     $result = mysqli_query($conn, $query);
 
     if ($result && mysqli_num_rows($result) > 0) {
@@ -18,48 +25,54 @@ if (isset($_GET['id'])) {
     echo "Invalid student ID!";
     exit;
 }
-  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
-        $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
-        $age = mysqli_real_escape_string($conn, $_POST['age']);
-        $gender = mysqli_real_escape_string($conn, $_POST['gender']);
-        $phone = mysqli_real_escape_string($conn, $_POST['phone']);
-        $address = mysqli_real_escape_string($conn, $_POST['address']);
-        $email = mysqli_real_escape_string($conn, $_POST['email']);
-        $imageQueryPart = ""; 
-        if (!empty($_FILES['profileImage']['name'])) {
-            $imageName = basename($_FILES['profileImage']['name']);
-            $imagePath = 'images-data/' . $imageName;
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
+    $middlename = mysqli_real_escape_string($conn, $_POST['middlename']);
+    $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
+    $age = mysqli_real_escape_string($conn, $_POST['age']);
+    $gender = mysqli_real_escape_string($conn, $_POST['gender']);
+    $phone = mysqli_real_escape_string($conn, $_POST['phone']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = $_POST['password'];
 
-       if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
-    $imageQueryPart = ", student.image = '$imagePath'";
-    } else {
-        echo "Failed to upload image.";
-        var_dump($_FILES); 
-        exit();
+    $imageQueryPart = ""; 
+    if (!empty($_FILES['profileImage']['name'])) {
+        $imageName = basename($_FILES['profileImage']['name']);
+        $imagePath = '../images-data/' . $imageName;
+
+        if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+            $imageQueryPart = ", student.image = '$imageName'";
+        } else {
+            echo "<script>alert('Failed to upload image.');</script>";
+        }
     }
-    }
+
     $updateQuery = "
         UPDATE student 
         JOIN loginCredentials ON student.id = loginCredentials.student_id
         SET 
             student.firstname = '$firstname',
+            student.middlename = '$middlename',
             student.lastname = '$lastname',
             student.age = '$age',
             student.gender = '$gender',
             student.phone = '$phone',
             student.address = '$address',
-            loginCredentials.email = '$email'
+            loginCredentials.email = '$email',
+            loginCredentials.password = '$password'
             $imageQueryPart
-        WHERE student.id = '$student_id'
+        WHERE student.id = '$id'
     ";
-        if (mysqli_query($conn, $updateQuery)) {
-            header("Location: student.php");
-            exit();
-        } else {
-            echo "Error updating profile: " . mysqli_error($conn);
-        }
+
+    if (mysqli_query($conn, $updateQuery)) {
+        header("Location: ?id=$id&update=success");
+        exit();
+    } else {
+        echo "Error updating profile: " . mysqli_error($conn);
     }
+}
+
     
 ?>
 <!DOCTYPE html>
@@ -78,7 +91,6 @@ if (isset($_GET['id'])) {
         <i class="fa-solid fa-arrow-left"></i>
     </a>
 </div>
-
 
    <form action="?id=<?php echo $student['id']; ?>" method="post" enctype="multipart/form-data">
     <div class="container">
@@ -122,13 +134,25 @@ if (isset($_GET['id'])) {
         </div>
 
       <div class="profile-section">
-   <div class="profile-pic">
-    <img id="profileImage" src="../images/blank-profile-picture-973460_1280.png" alt="Profile Picture">
-    <label for="profilePicture">Profile Picture:</label>
-    <input type="file" id="profilePicture" name="profilePicture" accept="image/*" required>
-    <button class="edit-btn" type="button" id="editButton"><i class="fa-solid fa-pen"></i></button>
+<div class="profile-pic" id="" >
+   <?php if (!empty($student['image'])) { ?>
+      <img 
+         src="<?php 
+            $imagePath = '../images-data/' . $student['image']; 
+            echo file_exists($imagePath) ? htmlspecialchars($imagePath) : '../' . htmlspecialchars($student['image']); 
+         ?>" 
+         class="profile-image" 
+         id="profileDisplay" 
+         alt="Profile"
+      >
+   <?php } else { ?>
+      <img src="../images-data/default-profile.png" class="profile-image" profileDisplay alt="Default Profile">
+   <?php } ?>
+   <label for="profileImage" class="edit-btn">
+      <i class="fa-solid fa-pen"></i>
+   </label>
+   <input type="file" id="profileImage" name="profileImage" accept="image/*" style="display: none;">
 </div>
-
     <div class="login-section">
         <div class="form-group">
             <label for="email">Email:</label>
@@ -144,14 +168,12 @@ if (isset($_GET['id'])) {
                             style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
                     </div>
         </div>
-        <button type="submit" name="submit" class="register-btn">Register</button>
+        <button type="submit" name="submit" class="register-btn">Update</button>
     </div>
 </div>
 
     </div>
 </form>
-
-
 
     <section class="modal-section">
     <span class="overlay"></span>
@@ -168,22 +190,43 @@ if (isset($_GET['id'])) {
 </section>
 
 <script>
+
+document.getElementById('profileImage').addEventListener('change', previewImage);
+
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('profileDisplay').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+
+         const passwordInput = document.getElementById('password');
+    const togglePasswordIcon = document.getElementById('togglePassword');
+
+    togglePasswordIcon.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        togglePasswordIcon.classList.toggle('fa-eye');
+        togglePasswordIcon.classList.toggle('fa-eye-slash');
+    });
+
     document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
         const section = document.querySelector(".modal-section"),
               overlay = document.querySelector(".overlay"),
               closeBtn = document.querySelector(".close-btn");
 
-        // Show the modal if update is successful
         if (urlParams.get('update') === 'success') {
             section.classList.add("active");
         }
 
-        // Close the modal when clicking overlay or close button
         overlay.addEventListener("click", () => section.classList.remove("active"));
         closeBtn.addEventListener("click", () => section.classList.remove("active"));
-
-        // Optionally, remove the 'update=success' parameter from the URL
         window.history.replaceState({}, document.title, window.location.pathname);
     });
 </script>
