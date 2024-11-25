@@ -676,3 +676,53 @@ form p {
         padding: 15px;
     }
 }
+ button[name="action"][value="approve"] {
+        background: linear-gradient(to right, #28a745, #218838);
+        color: #fff;
+        border: none;
+        padding: 10px 10px;
+        font-size: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button[name="action"][value="approve"]:hover {
+        background: linear-gradient(to right, #218838, #1e7e34);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    button[name="action"][value="approve"]:active {
+        transform: scale(0.95);
+    }
+
+    button[name="action"][value="approve"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.5);
+    }
+ button[name="action"][value="reject"] {
+        background: linear-gradient(to right,#ff0000, #7d1010);
+        color: #fff;
+        border: none;
+        padding: 10px 10px;
+        font-size: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button[name="action"][value="reject"]:hover {
+        background: linear-gradient(to right, #ff0000, #b92020);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    button[name="action"][value="reject"]:active {
+        transform: scale(0.95);
+    }
+
+    button[name="action"][value="reject"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(72, 180, 97, 0.5);
+    }

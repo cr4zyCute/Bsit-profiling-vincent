@@ -181,8 +181,6 @@ if (!isset($_SESSION['admin_email'])) {
         echo "Error inserting student: " . mysqli_error($conn);
     }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -305,7 +303,7 @@ if (!isset($_SESSION['admin_email'])) {
                                         echo "<form method='POST' action='handleApproval.php' enctype='multipart/form-data' style='display:inline-block;'>
                                                 <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
                                                 <input type='file' name='approval_picture' accept='image/*' required>
-                                                <button type='submit' name='action' value='approve'>Approve</button>
+                                                <button class type='submit' name='action' value='approve' >Approve</button>
                                             </form>
                                             <form method='POST' action='handleApproval.php' style='display:inline-block;'>
                                                 <input type='hidden' name='approval_id' value='" . htmlspecialchars($row['approval_id']) . "'>
@@ -397,56 +395,55 @@ if (!isset($_SESSION['admin_email'])) {
                 </tbody>
             </table>
                     </div>
-                 <div id="setting" class="section-content" style="display: none;">
-            <h2>Settings</h2>
-            <p>admin setting page</p>
-                <?php 
-                                
-                $admin_id = 1; 
-                    $query = "SELECT * FROM admin WHERE id = ?";
-                    $stmt = $conn->prepare($query);
-                    $stmt->bind_param('i', $admin_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $admin = $result->fetch_assoc();
-                    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                        $adminname = $_POST['adminname'];
-                        $admin_email = $_POST['admin_email'];
-                        $admin_password = $_POST['admin_password'];
+                 <div id="setting" class="section-content" style="display: block;">
+    <h2>Settings</h2>
+    <p>Admin setting page</p>
+    <?php 
+        $admin_id = 2; 
+        $query = "SELECT * FROM admin WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('i', $admin_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $admin = $result->fetch_assoc();
 
-                        $update_query = "UPDATE admin SET adminname = ?, admin_email = ?, admin_password = ? WHERE id = ?";
-                        $update_stmt = $conn->prepare($update_query);
-                        $update_stmt->bind_param('sssi', $adminname, $admin_email, $admin_password, $admin_id);
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $adminname = $_POST['username'];
+            $admin_email = $_POST['email'];
+            $admin_password = $_POST['password'];
 
-                        if ($update_stmt->execute()) {
-                            echo "<p>Admin details updated successfully!</p>";
-                        } else {
-                            echo "<p>Error updating admin details.</p>";
-                        }
-                    }
-                ?>                            
-            <form method="post">
-                <div>
-                    <label for="username">Admin Name:</label>
-                    <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['adminname']); ?>" required>
-                </div>
-                <div>
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['admin_email']); ?>" required>
-                </div>
-                <div>
-                    <label for="password">Password:</label>
-                    <div style="position: relative; display: inline-block;">
-                        <input type="password" id="password" name="password" 
-                            value="<?php echo htmlspecialchars($admin['admin_password']); ?>" required 
-                            style="padding-right: 30px;">
-                        <i class="fa-solid fa-eye-slash" id="togglePassword" 
-                            style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
-                    </div>
-                </div>
-                <button type="submit" class="adminupdatebtn" >Update Admin</button>
-            </form>
+            $update_query = "UPDATE admin SET adminname = ?, admin_email = ?, admin_password = ? WHERE id = ?";
+            $update_stmt = $conn->prepare($update_query);
+            $update_stmt->bind_param('sssi', $adminname, $admin_email, $admin_password, $admin_id);
+
+            if ($update_stmt->execute()) {
+                echo "<p>Admin details updated successfully!</p>";
+            } else {
+                echo "<p>Error updating admin details: " . $conn->error . "</p>";
+            }
+        }
+    ?>                            
+    <form method="post">
+        <div>
+            <label for="username">Admin Name:</label>
+            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['adminname']); ?>" required>
         </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['admin_email']); ?>" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <div style="position: relative; display: inline-block;">
+                <input type="password" id="password" name="password" value="<?php echo htmlspecialchars($admin['admin_password']); ?>" required>
+                <i class="fa-solid fa-eye-slash" id="togglePassword" 
+                    style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+            </div>
+        </div>
+        <button type="submit" class="adminupdatebtn">Update Admin</button>
+    </form>
+</div>
+
 
     </main>
     </div>

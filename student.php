@@ -85,9 +85,12 @@ if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
         if ($statusResult && mysqli_num_rows($statusResult) > 0) {
             $statusRow = mysqli_fetch_assoc($statusResult);
             $approvalStatus = $statusRow['status'];
+        
         }
-?>
 
+        
+
+?>
 
 <!DOCTYPE html>
 <html lang="en">

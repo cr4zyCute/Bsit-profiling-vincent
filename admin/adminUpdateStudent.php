@@ -92,6 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </a>
 </div>
 
+   <div class="type">
+    <p>Updating Student</p>
+</div>
+
+
    <form action="?id=<?php echo $student['id']; ?>" method="post" enctype="multipart/form-data">
     <div class="container">
         <div class="form-section">

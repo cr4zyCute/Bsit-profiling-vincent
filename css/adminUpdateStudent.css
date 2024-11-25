@@ -32,7 +32,7 @@ body {
 }
 @keyframes type{
     to {
-        width: 27ch;
+        width: 35ch;
     }
 }
 @keyframes blink {
