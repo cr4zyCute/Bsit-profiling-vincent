@@ -399,7 +399,7 @@ if (!isset($_SESSION['admin_email'])) {
     <h2>Settings</h2>
     <p>Admin setting page</p>
     <?php 
-        $admin_id = 1; 
+        $admin_id = 2; 
         $query = "SELECT * FROM admin WHERE id = ?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param('i', $admin_id);

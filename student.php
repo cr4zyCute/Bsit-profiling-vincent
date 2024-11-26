@@ -32,30 +32,39 @@ if (!empty($_SESSION['student_id'])) {
         $address = mysqli_real_escape_string($conn, $_POST['address']);
         $email = mysqli_real_escape_string($conn, $_POST['email']);
         $imageQueryPart = ""; 
-       $imageName = basename($_FILES['profileImage']['name']);
-$imagePath = 'images-data/' . $imageName;
+        $imageName = basename($_FILES['profileImage']['name']);
+        $password = $_POST['password'];
+        $imagePath = 'images-data/' . $imageName;
 
-if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
-    $imageQueryPart = ", student.image = '$imageName'";
-} else {
-    echo "Failed to upload image.";
-    exit();
+$imageQueryPart = ""; 
+if (!empty($_FILES['profileImage']['name'])) {
+    $imageName = basename($_FILES['profileImage']['name']);
+    $imagePath = 'images-data/' . $imageName;
+
+    if (move_uploaded_file($_FILES['profileImage']['tmp_name'], $imagePath)) {
+        $imageQueryPart = ", student.image = '$imageName'";
+    } else {
+        echo "Failed to upload image.";
+        exit();
+    }
 }
 
-    $updateQuery = "
-        UPDATE student 
-        JOIN loginCredentials ON student.id = loginCredentials.student_id
-        SET 
-            student.firstname = '$firstname',
-            student.lastname = '$lastname',
-            student.age = '$age',
-            student.gender = '$gender',
-            student.phone = '$phone',
-            student.address = '$address',
-            loginCredentials.email = '$email'
-            $imageQueryPart
-        WHERE student.id = '$student_id'
-    ";
+$updateQuery = "
+    UPDATE student 
+    JOIN loginCredentials ON student.id = loginCredentials.student_id
+    SET 
+        student.firstname = '$firstname',
+        student.lastname = '$lastname',
+        student.age = '$age',
+        student.gender = '$gender',
+        student.phone = '$phone',
+        student.address = '$address',
+        loginCredentials.email = '$email',
+        loginCredentials.password = '$password'
+        $imageQueryPart
+    WHERE student.id = '$student_id'
+";
+
         if (mysqli_query($conn, $updateQuery)) {
             header("Location: student.php");
             exit();
